@@ -27,9 +27,12 @@ limit_posts         : 0
 future              : false
 unpublished         : false
 
+# Theme
+remote_theme: pages-themes/dinky@v0.2.0
+
 # Plugins
 whitelist           : []
-plugins             : []
+plugins             : ["jekyll-remote-theme"]
 
 # Conversion
 markdown            : kramdown
