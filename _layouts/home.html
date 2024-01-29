@@ -1,0 +1,25 @@
+---
+layout: default
+---
+
+<div class="home">
+  {%- if page.title -%}
+    <h1 class="page-heading">{{ page.title }}</h1>
+  {%- endif -%}
+
+  {{ content }}
+
+  {%- for topic in site.topics -%}
+      
+    <h2>
+      <li>
+        <a class="topic-link" href="{{ topic.url | relative_url }}">
+          {{ topic.title | escape }}
+        </a>
+      </li>
+    </h2>
+    {{ topic.description | escape }}
+      
+  {%- endfor -%}
+
+</div>
