@@ -28,7 +28,9 @@ url: https://duncuiad.github.io # the base hostname & protocol for your site, e.
 # twitter_username: Duncuiad
 github_username:  Duncuiad
 permalink: pretty
-markdown: GFM
+markdown: kramdown
+kramdown:
+  math_engine: katex
 
 collections:
   topics:

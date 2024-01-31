@@ -4,3 +4,9 @@
 
 layout: home
 ---
+
+<h1>
+WIP
+</h1>
+
+This website is currently under construction.

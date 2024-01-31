@@ -6,3 +6,6 @@ categories: wip
 ---
 
 This website is under construction.
+
+
+$$ Some \LaTeX $$

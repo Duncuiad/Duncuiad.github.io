@@ -7,3 +7,7 @@ title: Tiles
 description: >-
   A description for the Tiles section
 ---
+
+<p align="center">
+  <img src="/Pictures/TileMesh1.jpg" alt="Tiles"/>
+</p>
