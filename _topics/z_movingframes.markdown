@@ -1,11 +1,11 @@
 ---
-# Feel free to add content and custom Front Matter to this file.
-# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
-
+permalink: /topics/movingframes
 layout: page
 title: Moving Frames
+pitch: >-
+  The best-quality interpolation between moving transforms on the market
 description: >-
-  A description for the Moving Frames section
+  Transforms with velocities and the corresponding smooth splines. Implemented with dual quaternions and their exponential map
 katek: true
 ---
 

@@ -9,17 +9,18 @@ layout: default
 
   {{ content }}
 
-  {%- for topic in site.topics -%}
-      
-    <h2>
-      <li>
-        <a class="topic-link" href="{{ topic.url | relative_url }}">
+  <ul>
+    {%- for topic in site.topics -%}
+    <li>
+      <h2>
+        <a class="post-link" href="{{ topic.url | relative_url }}">
           {{ topic.title | escape }}
         </a>
-      </li>
-    </h2>
-    {{ topic.description | escape }}
-      
-  {%- endfor -%}
+      </h2>
+      <p class="post-meta">$\textit{``{{ topic.pitch | escape }}"}$</p>
+      <p>{{ topic.description | escape }}</p>
+    </li>
+    {%- endfor -%}
+  </ul>
 
 </div>
