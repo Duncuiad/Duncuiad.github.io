@@ -1,0 +1,33 @@
+---
+layout: post
+title:  "A Square-Triangle Tiling, by Subdivision"
+date:   2024-02-03 07:38:00 +0100
+categories: "tilemesh"
+---
+
+<p align="center">
+  <img src="/Pictures/TileMesh2_800w.jpg" alt="Square Triangle Tiling"/>
+</p>
+
+<h2>1. Grids</h2>
+
+Plenty of games take place on some sort of grid. Taking three-dimensional space and cutting it into small, bite-sized blocks is what allows us to create worlds that players can shape at their will. Lucky for us, no matter how far a world stretches in any direction, we always have *three regular grids* we can rely on: *squares* in a checkerboard pattern, regular *hexagons* in a hex grid, and regular *triangles* on the dual[^1] of a hex grid. If we need to go to three dimensions, just make a copy of the grid and offset it a little upwards. Do this a bunch of times and there are your blocks!
+
+The most well known example, [Minecraft](https://www.minecraft.net/), leverages everything that a cube-based voxelization of space has to offer: each block is *exactly the same*, geometrically, as the others. This means that no matter what a block is made of, we can pick it up and put it down somewhere else. This homogeneity, however, comes at a cost: if you have ever tried to build a road in Minecraft that is not oriented either north-south or east-west, you'll have noticed that there is no way of creating one without giving it jagged edges.
+
+<!-- IMAGE SUGGESTION: Minecraft and Townscaper compared -->
+
+The best escape from this geometrical cage was in my opinion delivered by Oskar Stålberg's [Townscaper](https://www.townscapergame.com/), a title that has since *deservedly* spawned its own subgenre of town building games. In Townscaper, the regular grid is thrown out of the window and its place is taken by an organic mesh of quads. Most of them surround the vertices of the grid four at a time, just like they would in a regular grid. But in some places on this mesh, sometimes three, five, or six quads surround the same vertex. It's here that Oskar's grid shines. Those vertices become natural spots for *crossroads* or sudden turns of roads that are free to extend *mostly straight* in any direction.
+
+This kind of geometry, with winding streets that meet at ever different angles, is perfectly suited to building towns with a traditional southern European architecture, something that is intentionally hinted at by Townscaper's beautiful artistic style. What is lost, then, doesn't come unexpected: straight roads are left behind so that bendier ones can take over the stage. In Townscaper, no two cells of the grid are alike[^2]. Every edge is a different length and every step a different direction.
+
+It comes natural, then, to ask if somewhere *in the middle* there is room for a different style altogether. Enter this series of posts. It will be my aim to explore a different kind of grid, which is more winding than with only cubes, but such that every block is guaranteed to have the same proportions to (almost) all others. This post will focus on how such a grid is built geometrically, while future ones will focus on either some mathematical properties of this grid that we can leverage in our implementation, or some implementation choices that make this grid suitable and efficient for real-time applications.
+
+<h2>2. Square-Triangle Tilings</h2>
+
+<p align="center">
+  <img src="/Pictures/TileMesh_SquareA_H_400w.gif" alt="Square"/>
+</p>
+
+[^1]: The dual of a grid is another grid that is closely related to the one you started with: every face on the first becomes a vertex on the second and, vice versa, each vertex in the first one turns into a face of the other one. See [Dual Tessellation](https://mathworld.wolfram.com/DualTessellation.html) on Wolfram MathWorld.
+[^2]: You shouldn't take this as criticism, because it's really the opposite. That every cell of the grid, however skewed, is still topologically a quad is a *feature* of Oskar's approach: that's how he's able to turn players' random clicks on the grid into aesthetically pleasing buildings, without having to take into consideration more individual combinations than he really needs to. You should definitely check out his talks on YouTube, where he explains some of the algorithms behind Townscaper, if you haven't already.
