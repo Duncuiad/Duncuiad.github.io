@@ -17,7 +17,13 @@ layout: default
           {{ topic.title | escape }}
         </a>
       </h2>
-      <p class="post-meta">$\textit{``{{ topic.pitch | escape }}"}$</p>
+      <p class="post-meta">
+        $\textit{``}$
+        {%- for piece in topic.pitch -%}
+          $\textit{\phantom{}{{ piece | escape }}}$
+        {%- endfor -%}
+        $\textit{"}$
+      </p>
       <p>{{ topic.description | escape }}</p>
     </li>
     {%- endfor -%}

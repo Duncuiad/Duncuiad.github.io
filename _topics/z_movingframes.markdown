@@ -2,8 +2,9 @@
 permalink: /topics/movingframes
 layout: page
 title: Moving Frames
-pitch: >-
-  The best-quality interpolation between moving transforms on the market
+pitch:
+  ["The best-quality interpolation between",
+  " moving transforms on the market"]
 description: >-
   Transforms with velocities and the corresponding smooth splines. Implemented with dual quaternions and their exponential map
 katek: true
