@@ -36,6 +36,8 @@ kramdown:
 collections:
   topics:
     output: true
+  review:
+    output: true
 
 # Build settings
 theme: minima

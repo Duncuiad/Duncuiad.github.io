@@ -22,6 +22,7 @@ The best escape from this geometrical cage was in my opinion delivered by Oskar 
 <p align="center">
   <img src="/Pictures/Townscaper_2_360w.jpg" alt="Townscaper"/>
   <img src="/Pictures/Townscaper_1_360w.jpg" alt="Townscaper Grid"/>
+  <p class="post-meta" align="center">Townscaper by Oskar Stålberg</p>
 </p>
 
 This kind of geometry, with winding streets that meet at ever different angles, is perfectly suited to building towns with a traditional southern European architecture, something that is intentionally hinted at by Townscaper's beautiful artistic style. What is lost, then, doesn't come unexpected: straight roads are left behind so that bendier ones can take over the stage. In Townscaper, no two cells of the grid are alike[^2]. Every edge is a different length and every step a different direction.
@@ -34,25 +35,31 @@ If there was a way to inject some equilateral triangles in the grid, then all of
 
 The most straightforward approach would be to start with a square and then begin *attaching* either squares or triangles to its edges, selected randomly, going outwards one shape at a time. The problem with this strategy is that it is very easy to end up with a configuration that can't be expanded further. In fact, as soon as a vertex happens to be surrounded by four triangles and one square, there is no way to add a shape to the grid's boundary to completely surround that vertex and continue outwards. Which means that we have to roll back one or more steps every time that this happens. The cost of the procedure is starting to skyrocket, making it *less suitable* for generating *large grids*. So let's look for an alternative.
 
-A better approach would be to progressively subdivide an existing grid into a denser one where every cell is guaranteed to fit well with its neighbours. After all, this works well grids made up entirely of either squares or triangles. But how do we subdivide a square or a triangle into a collection of *both* squares and triangles? Well, we can't create a subdivision that shares the same boundary as the original cell, but we can come very close, by allowing some subcells to protrude out of and others to recede from the original edges.
+A better approach is to progressively subdivide an existing grid into a denser one where every cell is guaranteed to fit with its neighbours. After all, this works well with grids made up entirely of either squares or triangles. But how do we subdivide a square or a triangle into a collection of *both* squares and triangles? Well, we can't create a subdivision that shares the same boundary as the original cell, but we can come very close, by allowing some subcells to protrude out of, and others to recede from, the original edges.
 
 <p align="center">
   <img src="/Pictures/TileMesh_SquareA_H_400w.gif" alt="Square"/>
+  <p class="post-meta" align="center">Iterative subdivision of a square</p>
 </p>
 
 This kind of iterative process is referred to as 'applying a [deflation  rule](https://en.wikipedia.org/wiki/Penrose_tiling#Inflation_and_deflation)' in the world of mathematical tilings. 
 
-The deflation rules I use here build upon[^3] the rules introduced in \[X. Zeng & G. Ungar (2006)\][^R1]. Compared to that paper, I found I needed to make a distinction not only between 'blue' and 'red' edges (I'll explain what that means in short order), but also between 'alternating' and 'non-alternating' edges. This led to the need for introducing two separate kinds of triangles and three kinds of squares.
+The deflation rules I use here build upon[^3] the rules introduced in \[X. Zeng & G. Ungar (2006)\][^R1]. Compared to that paper, I found I needed to make a distinction not only between 'blue' and 'red' edges (I'll explain what that means in short order), but also between 'alternating' and 'non-alternating' edges. This led to the need for introducing two separate kinds of triangles and three different kinds of squares.
+
+<h2>3. Deflation Rules</h2>
 
 Here are all of them:
 
 <p align="center">
   <img src="/Pictures/Deflation_Rules.svg" alt="Deflation"/>
+  <p class="post-meta" align="center">Deflation rules</p>
 </p>
 
-As you can see, at each subdivision step (called a *generation*), every edge is split into two shorter edges. They both deviate $15^\circ$ from the original edge and their length is scaled by a factor of $\frac{1}{2} \left( \sqrt{6} - \sqrt{2} \right) \approx 0.5176$. If the child edges are inside the original polygon, we say that the parent is a *red* edge. If they instead end up outside of the original polygon, we say the parent is a *blue* edge. This means that in any tessellation, two polygons can only be adjacent across edges of opposite colors. If this property isn't enforced, the following generation will have overlaps and/or uncoverable (by means of squares and triangles) holes, meaning that it won't be a *valid* tessellation.
+There's a lot happening at the same time in this picture, so let's unpack it one piece at a time. For the time being, focus on the left column and ignore all the big black dots. Also ignore how the shapes on the right of the arrows are colored (since this is what sets the left and right columns apart) and take in just their geometrical structure. The relevant information is contained in the unbroken lines. The dotted edges are meant as little more than a preview of the outline of the next generation.
 
-Given a square-triangle tiling where every tile has edge colors selected from the collection above and where the red-blue pairing is respected, we are now able to perform the *first* subdivision step and obtain a new tiling. But how do we make sure that we can go on from there and subdivide it into yet another smaller tiling? Which is to say: what color do we have to assign to the edges of the child faces so that the subdivision rules provide valid tilings? This is where the 'alternating'/'non-alternating' edge classification comes into play.
+As you can see, at each subdivision step (called a *generation*), every edge is split into two shorter edges. They both deviate $15^\circ$ from the original edge and their length is scaled by a factor of $\frac{1}{2} \left( \sqrt{6} - \sqrt{2} \right) \approx 0.5176$. If the child edges are inside the original polygon, we say that the parent is a *red* edge. If they instead end up outside of the original polygon, we say the parent is a *blue* edge. This means that in any tessellation, two polygons can only be adjacent across edges of opposite colors. If this property isn't enforced, the following generation will have overlaps and/or uncoverable holes (at least by means of other squares and triangles), meaning that it won't be a *valid* tessellation. The reason for including the dotted lines in the diagrams is that they make it easier to identify which side of the inner edges is meant to be red and which is meant to be blue.
+
+Given a square-triangle tiling where every tile has edge color combinations selected from the collection above and where the red-blue pairing is respected, we are now able to perform a *first* subdivision step and obtain a new tiling. But how do we make sure that we can go on from there and subdivide it into yet another smaller, *valid* tiling? Which is to say: what color do we assign to the edges of the child faces so that we have the information we need in order to apply a new deflation? This is where the 'alternating'/'non-alternating' edge classification comes into play.
 
 ___
 
