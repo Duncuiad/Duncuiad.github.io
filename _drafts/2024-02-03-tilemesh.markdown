@@ -19,15 +19,44 @@ The most well known example, [Minecraft](https://www.minecraft.net/), leverages 
 
 The best escape from this geometrical cage was in my opinion delivered by Oskar Stålberg's [Townscaper](https://www.townscapergame.com/), a title that has since *deservedly* spawned its own subgenre of town building games. In Townscaper, the regular grid is thrown out of the window and its place is taken by an organic mesh of quads. Most of them surround the vertices of the grid four at a time, just like they would in a regular grid. But in some places on this mesh, sometimes three, five, or six quads surround the same vertex. It's here that Oskar's grid shines. Those vertices become natural spots for *crossroads* or sudden turns of roads that are free to extend *mostly straight* in any direction.
 
+<p align="center">
+  <img src="/Pictures/Townscaper_2_360w.jpg" alt="Townscaper"/>
+  <img src="/Pictures/Townscaper_1_360w.jpg" alt="Townscaper Grid"/>
+</p>
+
 This kind of geometry, with winding streets that meet at ever different angles, is perfectly suited to building towns with a traditional southern European architecture, something that is intentionally hinted at by Townscaper's beautiful artistic style. What is lost, then, doesn't come unexpected: straight roads are left behind so that bendier ones can take over the stage. In Townscaper, no two cells of the grid are alike[^2]. Every edge is a different length and every step a different direction.
 
-It comes natural, then, to ask if somewhere *in the middle* there is room for a different style altogether. Enter this series of posts. It will be my aim to explore a different kind of grid, which is more winding than with only cubes, but such that every block is guaranteed to have the same proportions to (almost) all others. This post will focus on how such a grid is built geometrically, while future ones will focus on either some mathematical properties of this grid that we can leverage in our implementation, or some implementation choices that make this grid suitable and efficient for real-time applications.
+It comes natural, then, to ask if somewhere *in the middle* there is room for a different style altogether. Enter this series of posts. It will be my aim to explore a different kind of grid, which is more winding than only having cubes, but such that every block is guaranteed to have the same proportions to (almost) all others. This post will focus on how such a grid is built geometrically, while future ones will focus on either some mathematical properties of this grid that we can leverage in our implementation, or some implementation choices that make this grid suitable and efficient enough for real-time applications.
 
 <h2>2. Square-Triangle Tilings</h2>
+
+If there was a way to inject some equilateral triangles in the grid, then all of a sudden it would be possible to turn at something else than right angles. From now on I will always refer to equilateral triangles as just *triangles*, since it shouldn't create any particular ambiguity. But how to build a grid of triangles and squares?
+
+The most straightforward approach would be to start with a square and then begin *attaching* either squares or triangles to its edges, selected randomly, going outwards one shape at a time. The problem with this strategy is that it is very easy to end up with a configuration that can't be expanded further. In fact, as soon as a vertex happens to be surrounded by four triangles and one square, there is no way to add a shape to the grid's boundary to completely surround that vertex and continue outwards. Which means that we have to roll back one or more steps every time that this happens. The cost of the procedure is starting to skyrocket, making it *less suitable* for generating *large grids*. So let's look for an alternative.
+
+A better approach would be to progressively subdivide an existing grid into a denser one where every cell is guaranteed to fit well with its neighbours. After all, this works well grids made up entirely of either squares or triangles. But how do we subdivide a square or a triangle into a collection of *both* squares and triangles? Well, we can't create a subdivision that shares the same boundary as the original cell, but we can come very close, by allowing some subcells to protrude out of and others to recede from the original edges.
 
 <p align="center">
   <img src="/Pictures/TileMesh_SquareA_H_400w.gif" alt="Square"/>
 </p>
 
+This kind of iterative process is referred to as 'applying a [deflation  rule](https://en.wikipedia.org/wiki/Penrose_tiling#Inflation_and_deflation)' in the world of mathematical tilings. 
+
+The deflation rules I use here build upon[^3] the rules introduced in \[X. Zeng & G. Ungar (2006)\][^R1]. Compared to that paper, I found I needed to make a distinction not only between 'blue' and 'red' edges (I'll explain what that means in short order), but also between 'alternating' and 'non-alternating' edges. This led to the need for introducing two separate kinds of triangles and three kinds of squares.
+
+Here are all of them:
+
+<p align="center">
+  <img src="/Pictures/Deflation_Rules.svg" alt="Deflation"/>
+</p>
+
+As you can see, at each subdivision step (called a *generation*), every edge is split into two shorter edges. They both deviate $15^\circ$ from the original edge and their length is scaled by a factor of $\frac{1}{2} \left( \sqrt{6} - \sqrt{2} \right) \approx 0.5176$. If the child edges are inside the original polygon, we say that the parent is a *red* edge. If they instead end up outside of the original polygon, we say the parent is a *blue* edge. This means that in any tessellation, two polygons can only be adjacent across edges of opposite colors. If this property isn't enforced, the following generation will have overlaps and/or uncoverable (by means of squares and triangles) holes, meaning that it won't be a *valid* tessellation.
+
+Given a square-triangle tiling where every tile has edge colors selected from the collection above and where the red-blue pairing is respected, we are now able to perform the *first* subdivision step and obtain a new tiling. But how do we make sure that we can go on from there and subdivide it into yet another smaller tiling? Which is to say: what color do we have to assign to the edges of the child faces so that the subdivision rules provide valid tilings? This is where the 'alternating'/'non-alternating' edge classification comes into play.
+
+___
+
 [^1]: The dual of a grid is another grid that is closely related to the one you started with: every face on the first becomes a vertex on the second and, vice versa, each vertex in the first one turns into a face of the other one. See [Dual Tessellation](https://mathworld.wolfram.com/DualTessellation.html) on Wolfram MathWorld.
 [^2]: You shouldn't take this as criticism, because it's really the opposite. That every cell of the grid, however skewed, is still topologically a quad is a *feature* of Oskar's approach: that's how he's able to turn players' random clicks on the grid into aesthetically pleasing buildings, without having to take into consideration more individual combinations than he really needs to. You should definitely check out his talks on YouTube, where he explains some of the algorithms behind Townscaper, if you haven't already.
+[^3]: The way a triangle is subdivided into one square and two triangles, as well as the ways a square is subdivided into four triangles and either one or two squares, come straight from the cited paper. However what doesn't add up in that paper is how the subdivided edges are assigned new colors to prepare for the next step of subdivision. In fact I encourage you to have a look at that paper and try to subdivide the square with 'all white' vertices: with the provided edge colorings, the subdivision breaks down at the third generation. By this I mean that two adjacent cells are subdivided into sets of cells that are no longer adjacent.
+[^R1]: X. Zeng & G. Ungar (2006) Inflation rules of square-triangle tilings: from approximants to dodecagonal liquid quasicrystals, Philosophical Magazine, 86:6-8, 1093-1103, DOI: 10.1080/14786430500363148
