@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "A Square-Triangle Tiling, by Subdivision"
+title:  "Generating a Square-Triangle Grid"
 date:   2024-02-03 07:38:00 +0100
 categories: "tilemesh"
 ---
@@ -57,13 +57,76 @@ Here are all of them:
 
 There's a lot happening at the same time in this picture, so let's unpack it one piece at a time. For the time being, focus on the left column and ignore all the big black dots. Also ignore how the shapes on the right of the arrows are colored (since this is what sets the left and right columns apart) and take in just their geometrical structure. The relevant information is contained in the unbroken lines. The dotted edges are meant as little more than a preview of the outline of the next generation.
 
+<h3>Edge Coloring</h3>
+
 As you can see, at each subdivision step (called a *generation*), every edge is split into two shorter edges. They both deviate $15^\circ$ from the original edge and their length is scaled by a factor of $\frac{1}{2} \left( \sqrt{6} - \sqrt{2} \right) \approx 0.5176$. If the child edges are inside the original polygon, we say that the parent is a *red* edge. If they instead end up outside of the original polygon, we say the parent is a *blue* edge. This means that in any tessellation, two polygons can only be adjacent across edges of opposite colors. If this property isn't enforced, the following generation will have overlaps and/or uncoverable holes (at least by means of other squares and triangles), meaning that it won't be a *valid* tessellation. The reason for including the dotted lines in the diagrams is that they make it easier to identify which side of the inner edges is meant to be red and which is meant to be blue.
 
-Given a square-triangle tiling where every tile has edge color combinations selected from the collection above and where the red-blue pairing is respected, we are now able to perform a *first* subdivision step and obtain a new tiling. But how do we make sure that we can go on from there and subdivide it into yet another smaller, *valid* tiling? Which is to say: what color do we assign to the edges of the child faces so that we have the information we need in order to apply a new deflation? This is where the 'alternating'/'non-alternating' edge classification comes into play.
+Given a square-triangle tiling where every tile has edge color combinations selected from the collection above and where the red-blue pairing is respected, we are now able to perform a *first* subdivision step and obtain a new tiling. But how do we make sure that we can go on from there and subdivide it into yet another smaller, *valid* tiling? Which is to say: what color do we assign to the edges of the child faces so that we have the information we need in order to apply a new deflation? This is where the dots come into play.
+
+<h3>Color Alternance</h3>
+
+We say that an edge is *alternating* if it splits into two edges of the opposite color: for example, a red alternating edge turns into two blue edges. We instead say that it is *non-alternating* if it splits into two edges of the same color as itself. All of the edges in the deflation rules are either alternating or non-alternating: no edge splits into two child edges of different colors. In the deflation rules diagram, a black dot denotes an alternating edge (you can check the color of the child edges on the right hand side of the arrows). The absence of a dot thus denotes a non-alternating edge. A triangle's edges are either all alternating (as in the left column) or all non-alternating. Because of this, the dot is drawn in the middle of the triangle.
+
+Since color pairings must be conserved at each following generation, a tile's alternating edge can only be adjacent to another tile's edge that is *also alternating*. The same kind of pairing must be respected in the case of non-alternating edges. We end up with four different types of edges, one for each combination of 'red'/'blue' and 'alternating'/'non-alternating'. You can see how they all evolve after one deflation (that is, which of the four types is assigned two their two children) on the right hand side of the arrows. I've also included a section on the bottom right of the diagram where you can see how each of them evolves after two consecutive deflations.
+
+With both *coloring* and *alternance* taken into account, the subdivision can be performed indefinitely. This means that no matter what shape we start with, we can make an arbitrarily large grid made up of triangles and squares.
+
+<p align="center">
+  <img src="/Pictures/None.gif" alt="Four Shapes"/>
+  <p class="post-meta" align="center">Repeated deflation of the A-Triangle, the N-Triangle, the B-Square, and the R-Square respectively</p>
+</p>
+
+Wait, why did I include only four of them? Well, that's because the square in the right column of the diagram *has* its own deflation rule, but it doesn't show up in the result of any of the five rules, non even its own. It's bound to disappear as soon as one subdivision is performed, so we could just as well do without it. Let's give a name to the other four shapes. We have a triangle whose edges are all *a*lternating, so that has to be an A-Triangle. One of the squares is all red, earning the title of R-Square. Let's settle on N-Triangle and B-Square for the other two.
+
+The B-Square is quite special because its deflation rule still allows it to tile a *periodic* square grid. So nothing is preventing us from wrapping a grid *Pac-Man-style* to obtain a tiling without a boundary. This is unique to the B-Square, since there's no way to similarly arrange any of the other three shapes[^4].
+
+<p align="center">
+  <img src="/Pictures/None.gif" alt="Toric B-Square"/>
+  <p class="post-meta" align="center">Periodic tiling of the plane with B-Squares</p>
+</p>
+
+<h2>4. Dual Tiling</h2>
+
+Something interesting happens if you start connecting the dots. *Quite literally*:
+
+<p align="center">
+  <img src="/Pictures/Alternance_Graph.svg" alt="Bicolorable Dual Graph" width=400px/>
+  <p class="post-meta" align="center">The Dual Tiling and the Alternance Graphs</p>
+</p>
+
+The rule requiring alternating edges to only touch other alternating edges, along with the complementary rule for their non-alternating cousins, transforms the edges of the dual tiling into a bi-colorable graph. The first subgraph, in orange, crosses all the *alternating* edges and the other one, in green, all the others. Every triangle can only belong to one of the two graphs. This seems to suggest that the A-Triangle and the N-Triangle play very different roles in this tiling. For instance, A-Triangles never bundle up in hexagons. Here is a wider view of the alternance graphs in their natural habitat:
+
+<p align="center">
+  <img src="/Pictures/Alternance_Graphs_1600w.png" alt="Bicolorable Dual Graph"/>
+  <p class="post-meta" align="center">The Alternance Graphs after a few deflations</p>
+</p>
+
+Another way the dual tiling turns out to be useful is to display data about the vertices. Since every vertex is a face in the dual, this is just coloring the dual faces according to some rule. For example, here is a nice visualization of the 'height' of every vertex: the darker a vertex is, the sooner it appeared in the deflation process. Focusing on the darker vertices, it's also not too difficult to discern the large triangles and squares that come from earlier steps of deflation.
+
+<p align="center">
+  <img src="/Pictures/Height_Triangle_A_360w.jpg" alt="Height Visualized"/>
+  <img src="/Pictures/Height_Triangle_A_Dual_360w.jpg" alt="Height Visualized, Dual"/>
+  <p class="post-meta" align="center">Visualizing vertex height, on the tiling (left) and its dual (right)</p>
+</p>
+
+<h2>5. What Now?</h2>
+
+So far I have done little more than outline a geometrical recipe to obtain a thicker and thicker grid. I've completely skimmed over some important questions that can't be ignored once the focus turns from rendering pretty pictures to using this grid for something *practical*. It will be my prime concern, in the next posts, to give satisfactory answers to the following questions:
+
+- Every time an edge is subdivided, the calculation of the position of its middle vertex becomes less and less *precise*. How can we prevent this error from exploding and consequently the grid from warping?
+- Something desirable of *regular* grids, like in Minecraft, is that one can say "jump north three blocks and east five more" and end up immediately at the right tile. This grid instead look just like a plain old mesh: you need to store the connectivity in each vertex/edge/face (which takes up space) and move in any direction one step at a time. This looks *bad*!
+- Given an arbitrary position on the plane, in order to identify the tile it lies on, is there a better way than to check every single tile on the grid until we find the right one?
+
+At the risk of spoiling some of the fun, I'll anticipate one cool fact that at once efficiently solves both the first two problems. There is a way to uniquely identify every possible vertex of the grid with a label, no matter how deep the level of subdivision. This labeling has enough information to perfectly reconstruct the position of the vertex, *without* loss! And what is even more amazing is that these labels can be scaled, added, subtracted, and multiplied together *in a meaningful way*.
+
+Hoping this wild claim caught your attention, I'll see you at the next post.
 
 ___
+
+<h3>Notes and References:</h3>
 
 [^1]: The dual of a grid is another grid that is closely related to the one you started with: every face on the first becomes a vertex on the second and, vice versa, each vertex in the first one turns into a face of the other one. See [Dual Tessellation](https://mathworld.wolfram.com/DualTessellation.html) on Wolfram MathWorld.
 [^2]: You shouldn't take this as criticism, because it's really the opposite. That every cell of the grid, however skewed, is still topologically a quad is a *feature* of Oskar's approach: that's how he's able to turn players' random clicks on the grid into aesthetically pleasing buildings, without having to take into consideration more individual combinations than he really needs to. You should definitely check out his talks on YouTube, where he explains some of the algorithms behind Townscaper, if you haven't already.
 [^3]: The way a triangle is subdivided into one square and two triangles, as well as the ways a square is subdivided into four triangles and either one or two squares, come straight from the cited paper. However what doesn't add up in that paper is how the subdivided edges are assigned new colors to prepare for the next step of subdivision. In fact I encourage you to have a look at that paper and try to subdivide the square with 'all white' vertices: with the provided edge colorings, the subdivision breaks down at the third generation. By this I mean that two adjacent cells are subdivided into sets of cells that are no longer adjacent.
+[^4]: The same periodic tiling as the one made up of B-Squares can also be obtained with the vanishing square, let's call it B'.
 [^R1]: X. Zeng & G. Ungar (2006) Inflation rules of square-triangle tilings: from approximants to dodecagonal liquid quasicrystals, Philosophical Magazine, 86:6-8, 1093-1103, DOI: 10.1080/14786430500363148
