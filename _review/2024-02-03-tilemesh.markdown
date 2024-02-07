@@ -67,9 +67,9 @@ Given a square-triangle tiling where every tile has edge color combinations sele
 
 <h3>Color Alternance</h3>
 
-We say that an edge is *alternating* if it splits into two edges of the opposite color: for example, a red alternating edge turns into two blue edges. We instead say that it is *non-alternating* if it splits into two edges of the same color as itself. All of the edges in the deflation rules are either alternating or non-alternating: no edge splits into two child edges of different colors. In the deflation rules diagram, a black dot denotes an alternating edge (you can check the color of the child edges on the right hand side of the arrows). The absence of a dot thus denotes a non-alternating edge. A triangle's edges are either all alternating (as in the left column) or all non-alternating. Because of this, the dot is drawn in the middle of the triangle.
+We say that an edge is *alternating* if it splits into two edges of the opposite color: for example, a red alternating edge turns into two blue edges. We instead say that it is *non-alternating* if it splits into two edges of the same color as itself. All of the edges in the deflation rules are either alternating or non-alternating: no edge splits into two child edges of different colors. In the deflation rules diagram, a black dot denotes an alternating edge (you can check the color of the child edges on the right hand side of the arrows). The absence of a dot thus denotes a non-alternating edge. A triangle's edges are either all alternating (as in the left column) or all non-alternating. Because of this, I can simply draw a single dot in the middle of the triangle.
 
-Since color pairings must be conserved at each following generation, a tile's alternating edge can only be adjacent to another tile's edge that is *also alternating*. The same kind of pairing must be respected in the case of non-alternating edges. We end up with four different types of edges, one for each combination of 'red'/'blue' and 'alternating'/'non-alternating'. You can see how they all evolve after one deflation (that is, which of the four types is assigned two their two children) on the right hand side of the arrows. I've also included a section on the bottom right of the diagram where you can see how each of them evolves after two consecutive deflations.
+Since color pairings must be conserved at each following generation, a tile's alternating edge can only be adjacent to another tile's edge that is *also alternating*. The same kind of pairing must be respected in the case of non-alternating edges. We end up with four different types of edges, one for each combination of 'red'/'blue' and 'alternating'/'non-alternating'. You can see how they all evolve after one deflation (that is, which of the four types is assigned to their two children) on the right hand side of the arrows. I've also included a section on the bottom right of the diagram where you can see how each of them evolves after two consecutive deflations.
 
 With both *coloring* and *alternance* taken into account, the subdivision can be performed indefinitely. This means that no matter what shape we start with, we can make an arbitrarily large grid made up of triangles and squares.
 
@@ -80,9 +80,9 @@ With both *coloring* and *alternance* taken into account, the subdivision can be
   </p>
 </p>
 
-Wait, why did I include only four of them? Well, that's because the square in the right column of the diagram *has* its own deflation rule, but it doesn't show up in the result of any of the five rules, non even its own. It's bound to disappear as soon as one subdivision is performed, so we could just as well do without it. Let's give a name to the other four shapes. We have a triangle whose edges are all *a*lternating, so that has to be an A-Triangle. One of the squares is all red, earning the title of R-Square. Let's settle on N-Triangle and B-Square for the other two.
+Wait, why did I include only four of them? Well, that's because the square in the right column of the diagram *has* its own deflation rule, but it doesn't show up in the result of any of the five rules, non even its own. It's bound to disappear as soon as one subdivision is performed, so we could just as well do without it. Let's give a name to the other four shapes then. We have a triangle whose edges are all *a*lternating, so that has to be an A-Triangle. One of the squares is all red, earning the title of R-Square. Let's settle on N-Triangle and B-Square for the other two.
 
-The B-Square is quite special because its deflation rule still allows it to tile a *periodic* square grid. So nothing is preventing us from wrapping a grid *Pac-Man-style* to obtain a tiling without a boundary. This is unique to the B-Square, since there's no way to similarly arrange any of the other three shapes[^4].
+The B-Square is quite special because its deflation rule still allows it to tile a *periodic* square grid. So nothing prevents us from wrapping a grid *Pac-Man-style* to obtain a tiling without a boundary. This is unique to the B-Square, since there's no way to similarly arrange any of the other three shapes[^4].
 
 <p align="center">
   <img src="/Pictures/Periodic.gif" alt="Toric B-Square"/>
@@ -105,7 +105,7 @@ The rule requiring alternating edges to only touch other alternating edges, alon
   <p class="post-meta" align="center">The Alternance Graphs after a few deflations</p>
 </p>
 
-Another way the dual tiling turns out to be useful is to display data about the vertices. Since every vertex is a face in the dual, this is just coloring the dual faces according to some rule. For example, here is a nice visualization of the 'height' of every vertex: the darker a vertex is, the sooner it appeared in the deflation process. Focusing on the darker vertices, it's also not too difficult to discern the large triangles and squares that come from earlier steps of deflation.
+Another way the dual tiling turns out to be useful is to display data about the vertices. Since every vertex is a face in the dual, we can paint the dual faces according to some rule. For example, here is a nice visualization of the 'height' of every vertex: the darker a vertex is, the sooner it appeared in the deflation process. Focusing on the darker vertices, it's also not too difficult to discern the large triangles and squares that come from earlier steps of deflation.
 
 <p align="center">
   <img src="/Pictures/Height_Triangle_A_360w.jpg" alt="Height Visualized"/>
@@ -121,9 +121,9 @@ So far I have done little more than outline a geometrical recipe to obtain a thi
 - Something desirable of *regular* grids, like in Minecraft, is that one can say "jump north three blocks and east five more" and end up immediately at the right tile. This grid instead look just like a plain old mesh: you need to store the connectivity in each vertex/edge/face (which takes up space) and move in any direction one step at a time. This looks *bad*!
 - Given an arbitrary position on the plane, in order to identify the tile it lies on, is there a better way than to check every single tile on the grid until we find the right one?
 
-At the risk of spoiling some of the fun, I'll anticipate one cool fact that at once efficiently solves both the first two problems. There is a way to uniquely identify every possible vertex of the grid with a label, no matter how deep the level of subdivision. This labeling has enough information to perfectly reconstruct the position of the vertex, *without* loss! And what is even more amazing is that these labels can be scaled, added, subtracted, and multiplied together *in a meaningful way*.
+At the risk of spoiling some of the fun, I'll anticipate one cool fact that, at once, efficiently solves both of the first two problems. There is a way to uniquely identify every possible vertex of the grid with a label, no matter how deep the level of subdivision. This labeling has enough information to perfectly reconstruct the position of the vertex, *without* loss! And what is even more amazing is that these labels can be scaled, added, subtracted, and multiplied together *in a meaningful way*.
 
-Hoping this wild claim caught your attention, I'll see you at the next post.
+I hope that this wild claim caught your attention, let's delve into it in the next post.
 
 ___
 
