@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Generating a Square-Triangle Grid"
+title:  "Minecraft + Triangles"
 date:   2024-02-03 07:38:00 +0100
 categories: "tilemesh"
 ---
@@ -8,6 +8,11 @@ categories: "tilemesh"
 <p align="center">
   <img src="/Pictures/TileMesh2_800w.jpg" alt="Square Triangle Tiling"/>
 </p>
+
+<ul>
+<li>Back to the <a href="/topics/tiles">Tiles</a> topic index.</li>
+<li><a href="https://github.com/Duncuiad/MovingFrames/blob/main/OpenGLPG/Core/TileMesh.h">TileMesh</a> on GitHub <svg class="svg-icon"><use xlink:href="{{ '/assets/minima-social-icons.svg#github' | relative_url }}"></use></svg> </li>
+</ul>
 
 <h2>1. Grids</h2>
 
