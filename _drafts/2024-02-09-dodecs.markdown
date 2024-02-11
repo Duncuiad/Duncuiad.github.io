@@ -124,7 +124,12 @@ which looks suspiciously like the linear interpolation formula $\left(1-t \right
 
 - Use the formula to deduce the position of all the vertices of a tiling after one round of deflation:
 
-[INSERT IMAGE HERE]
+
+
+<p align="center">
+  <img src="/Pictures/Post_2/Deflation_Coordinates.svg" width=800px alt="Deflation Coordinates"/>
+  <p class="post-meta" align="center">Vertices of the Deflation Diagram. The middle points are obtained by applying the formula to their parent edge's endpoints</p>
+</p>
 
 and we could go on forever, applying the formula to get the positions of the vertices that appear after further deflations.
 
@@ -134,13 +139,16 @@ In order to get there, we need to impose that whatever coordinate system we use,
 
 <h2>4. A Coordinate System for the Square-Triangle Grid</h2>
 
-In the picture that depicts the vertices of the deflation diagram, you can notice that everything is built using only four elementary points, beyond $0$. They are $1$, $\nu$, $i$, and $\gamma$. Every other point is obtained by addition or multiplication of those four. This sounds like a good candidate for a basis, doesn't it? Sadly, it can't be one: the four vectors are actually dependent[^6], since $\gamma = 1 + i - \nu$.
+In the picture that depicts the vertices of the deflation diagram, you can notice that everything is built using only four elementary points, beyond $0$. They are $1$, $\nu$, $i$, and $\tau$. Every other point is obtained by addition or multiplication of those four. This sounds like a good candidate for a basis, doesn't it? Sadly, it can't be one: the four vectors are actually dependent[^6], since $\tau = 1 + i - \nu$.
 
-Mindful of what we did when we found the collection $\left\\{1, \zeta, \zeta^2 \right\\}$ to not be independent in Section 1, you might ask if we should just leave $\gamma$ out of the picture and take $\left\\{1, i, \nu \right\\}$ as our basis. These vectors are indeed independent (nice!), but regretfully they don't allow us to reach all the points in the deflation diagram. This is because the grid made of all the possible combinations of $1$, $i$ and $\nu$ is closed under addition but not under multiplication[^7]. In fact, there is no way to add $1$, $i$ and $\nu$ together and obtain $i\nu$, which is precisely the product of $i$ and $\nu$.
+Mindful of what we did when we found the collection $\left\\{1, \zeta, \zeta^2 \right\\}$ to not be independent in Section 1, you might ask if we should just leave $\tau$ out of the picture and take $\left\\{1, i, \nu \right\\}$ as our basis. These vectors are indeed independent (nice!), but regretfully they don't allow us to reach all the points in the deflation diagram. This is because the grid made of all the possible combinations of $1$, $i$ and $\nu$ is closed under addition but not under multiplication[^7]. In fact, there is no way to add $1$, $i$ and $\nu$ together and obtain $i\nu$, which is precisely the product of $i$ and $\nu$.
 
-To be able to reach all points in the square-triangle grid, we need to add $i\nu$ to the collection. Luckily, that is already enough and it turns out that $\left\\{1, i, \nu, i\nu \right\\}$ is indeed a basis for the smallest *regular* grid that *contains any possible vertex* in our square-triangular grid, no matter how late it appears in the deflation process! We made it, we found our integer coordinates.
+To be able to reach all points in the square-triangle grid, we need to add $i\nu$ to the collection. Luckily, that is already enough and it turns out that $\left\\{1, i, \nu, i\nu \right\\}$ is indeed a basis for the smallest *regular* grid that *contains any possible vertex* in our square-triangular grid, no matter how late it appears in the deflation process! We did it, we found our integer coordinates.
 
-[INSERT PICTURE HERE]
+<p align="center">
+  <img src="/Pictures/Post_2/NI_Basis.svg" height=400px alt="NI Basis"/>
+  <p class="post-meta" align="center">The point of coordinates $(-1,2,3,-1)$ on the basis $\left\{1, i, \nu, i\nu \right\}$ </p>
+</p>
 
 This four-dimensional regular grid in the plane is, for mathematicians, "$\mathbb{Z}\left[\zeta_{12}\right]$, the ring of integers of the cyclotomic field $\mathbb{Q}\left(\zeta_{12}\right)$, where $\zeta_{12}$ is the twelfth root of unity". It's one of the structures studied by a branch of mathematics called number theory. For simplicity, I refer to its elements as "dodecs" -- short for "dodecagonal numbers" -- in the code implementation. I'll refer to them by the same name here, so long as you keep in mind that their actual name in maths is the former.
 
@@ -150,7 +158,7 @@ Naturally, as seen in Section 1, we could express dodecs in many different bases
 
 I'll use one of these to show how to build the sum and product operations on the coordinates, for two reasons: it's a basis that is more commonly used when working with $\mathbb{Z}\left[\zeta_{12}\right]$ and the calculations are a little simpler than when using the other one.
 
-This basis is $\left\\{1, \varphi, \varphi^2, \varphi^3 \right\\}$ and this picture show how you can obtain $\nu$ with it:
+This basis is $\left\\{1, \varphi, \varphi^2, \varphi^3 \right\\}$ and this picture shows how you can obtain $\nu$ with it:
 
 $$
 \nu = 1 - \varphi^2 + \varphi^3
@@ -161,7 +169,7 @@ $$
   <p class="post-meta" align="center">$\nu$ over the basis $\left\{ 1, \varphi, \varphi^2, \varphi^3 \right\}$ </p>
 </p>
 
-It also shows that in this basis, $i = \varphi^3$. With a little calculation, you can find that $i\nu = \varphi - 1$.
+It also shows that, in this basis, $i = \varphi^3$. With a little calculation, you can find that $i\nu = \varphi - 1$.
 
 Using this basis, the coordinates are added like this:
 
@@ -175,9 +183,103 @@ and multiplied like so:
 
 $$
 
-\left(x_0,y_0,z_0,w_0\right) \cdot \left(x_1,y_1,z_1,w_1\right) = \left(,,,\right)
+\left(x_0,y_0,z_0,w_0\right) \cdot \left(x_1,y_1,z_1,w_1\right) =
+
+\left(
+\begin{array}{c}
+x_0 x_1 - y_0 w_1 - z_0 z_1 - w_0 y_1 - w_0 w_1 \\
+x_0 y_1 + y_0 x_1 - z_0 w_1 - w_0 z_1 \\
+x_0 z_1 + y_0 y_1 + z_0 x_1 + y_0 w_1 + z_0 z_1 + w_0 y_1 \\
+x_0 w_1 + y_0 z_1 + z_0 y_1 + w_0 x_1 + z_0 w_1 + w_0 z_1
+\end{array}
+\right)
 
 $$
+
+<details>
+<summary>$\boxed{\text{Danger, Algebra Inside}} - \text{How are the formulas obtained?}$</summary>
+<br>
+<hr>
+
+We define the sum to work like the complex sum operates on the corresponding points on the complex plane:
+
+$$
+\left(x_0,y_0,z_0,w_0\right) + \left(x_1,y_1,z_1,w_1\right) \leftrightarrow
+\left( x_0 + y_0 \varphi + z_0 \varphi^2 + w_0 \varphi^3 \right) + \left( x_1 + y_1 \varphi + z_1 \varphi^2 + w_1 \varphi^3 \right)
+$$
+
+We can rearrange the terms and factor the common ones:
+
+$$
+\begin{array}{rl}
+& x_0 + y_0 \varphi + z_0 \varphi^2 + w_0 \varphi^3 + x_1 + y_1 \varphi + z_1 \varphi^2 + w_1 \varphi^3 \\
+= & \left(x_0 + x_1\right) + \left(y_0 + y_1\right) \varphi + \left(z_0 + z_1\right) \varphi^2 + \left(w_0 + w_1\right) \varphi^3
+\end{array}
+$$
+
+Reading the coefficients of the basis vectors, we find the coordinates:
+
+$$
+\left(x_0+x_1,y_0+y_1,z_0+z_1,w_0+w_1\right)
+$$
+
+The producted is computed similarly:
+
+$$
+\left(x_0,y_0,z_0,w_0\right) \cdot \left(x_1,y_1,z_1,w_1\right) \leftrightarrow
+\left( x_0 + y_0 \varphi + z_0 \varphi^2 + w_0 \varphi^3 \right) \cdot \left( x_1 + y_1 \varphi + z_1 \varphi^2 + w_1 \varphi^3 \right)
+$$
+
+This time around distribute the product over the sum:
+
+$$
+\begin{array}{rcl}
+  &        x_0 x_1 & 1 \\
++ & \left( x_0 y_1 + y_0 x_1 \right) & \varphi \\
++ & \left( x_0 z_1 + y_0 y_1 + z_0 x_1 \right) & \varphi^2 \\
++ & \left( x_0 w_1 + y_0 z_1 + z_0 y_1 + w_0 x_1 \right) & \varphi^3 \\
++ & \left( y_0 w_1 + z_0 z_1 + w_0 y_1 \right) & \varphi^4 \\
++ & \left( z_0 w_1 + w_0 z_1 \right) & \varphi^5 \\
++ &        w_0 w_1 & \varphi^6 \\
+\end{array}
+$$
+
+A peculiarity of the number $\varphi$ is that $\varphi^4 = \varphi^2 - 1$. This lets us lower the degree of some terms, by expressing $\varphi^4$, $\varphi^5$ and $\varphi^6$ with the basis $\left\{1, \varphi, \varphi^2, \varphi^3 \right\}$:
+
+$$
+\begin{array}{rcl}
+\varphi^4 & = & \varphi^2 - 1 \\
+\varphi^5 = \varphi \cdot \varphi^4 & = & \varphi^3 - \varphi \\
+\varphi^6 = \varphi^2 \cdot \varphi^4 & = & \varphi^4 - \varphi^2 = \left(\varphi^2 - 1\right) - \varphi^2 = -1
+\end{array}
+$$
+
+Substituting in the previous expression,
+
+$$
+\begin{array}{rcl}
+  &        x_0 x_1 - \left( y_0 w_1 + z_0 z_1 + w_0 y_1 \right) - w_0 w_1 & 1\\
++ & \left( x_0 y_1 + y_0 x_1 \right) - \left( z_0 w_1 + w_0 z_1 \right) & \varphi \\
++ & \left( x_0 z_1 + y_0 y_1 + z_0 x_1 \right) + \left( y_0 w_1 + z_0 z_1 + w_0 y_1 \right) & \varphi^2 \\
++ & \left( x_0 w_1 + y_0 z_1 + z_0 y_1 + w_0 x_1 \right) + \left( z_0 w_1 + w_0 z_1 \right) & \varphi^3 \\
+\end{array}
+$$
+
+Which says that the coordinates of the product are
+
+$$
+\left(
+\begin{array}{c}
+x_0 x_1 - y_0 w_1 - z_0 z_1 - w_0 y_1 - w_0 w_1 \\
+x_0 y_1 + y_0 x_1 - z_0 w_1 - w_0 z_1 \\
+x_0 z_1 + y_0 y_1 + z_0 x_1 + y_0 w_1 + z_0 z_1 + w_0 y_1 \\
+x_0 w_1 + y_0 z_1 + z_0 y_1 + w_0 x_1 + z_0 w_1 + w_0 z_1
+\end{array}
+\right)
+$$
+
+<hr>
+</details>
 
 [CONCLUSION]
 
