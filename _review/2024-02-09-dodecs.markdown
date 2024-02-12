@@ -70,7 +70,7 @@ y_p = \left(-5\right) \left(\frac{\sqrt{3}}{2}\right) + \left(-12\right) \left(-
 \end{array}
 $$
 
-With this in mind, it follows that we can avoid progagating numerical errors in the calculation of vertices' positions, fixing the problem posed by the first question, if:
+With this in mind, it follows that we can avoid progagating numerical errors in the calculation of vertices' positions, and is so doing fix the problem posed by the first question, if:
 
 - We can assign to each vertex of the grid some integer coordinates with respect to some basis (that's just answering the second question!)
 - We can obtain the integer coordinates of the middle vertex by only using the integer coordinates of an edge's endpoints.
@@ -127,7 +127,7 @@ which looks suspiciously like the linear interpolation formula $\left(1-t \right
 
 
 <p align="center">
-  <img src="/Pictures/Post_2/Deflation_Coordinates.svg" width=800px alt="Deflation Coordinates"/>
+  <img src="/Pictures/Post_2/Deflation_From_Midpoint.jpg" alt="Deflation Coordinates"/>
   <p class="post-meta" align="center">Vertices of the Deflation Diagram. The middle points are obtained by applying the formula to their parent edge's endpoints</p>
 </p>
 
@@ -147,12 +147,12 @@ To be able to reach all points in the square-triangle grid, we need to add $i\nu
 
 <p align="center">
   <img src="/Pictures/Post_2/NI_Basis.svg" height=400px alt="NI Basis"/>
-  <p class="post-meta" align="center">The point of coordinates $(-1,2,3,-1)$ on the basis $\left\{1, i, \nu, i\nu \right\}$ </p>
+  <p class="post-meta" align="center">The point of coordinates $(-1,1,3,-1)$ on the basis $\left\{1, i, \nu, i\nu \right\}$ </p>
 </p>
 
-This four-dimensional regular grid in the plane is, for mathematicians, "$\mathbb{Z}\left[\zeta_{12}\right]$, the ring of integers of the cyclotomic field $\mathbb{Q}\left(\zeta_{12}\right)$, where $\zeta_{12}$ is the twelfth root of unity". It's one of the structures studied by a branch of mathematics called number theory. For simplicity, I refer to its elements as "dodecs" -- short for "dodecagonal numbers" -- in the code implementation. I'll refer to them by the same name here, so long as you keep in mind that their actual name in maths is the former.
+This four-dimensional regular grid in the plane is, for mathematicians, "$\mathbb{Z}\left[\zeta_{12}\right]$, the ring of integers of the cyclotomic field $\mathbb{Q}\left(\zeta_{12}\right)$, where $\zeta_{12}$ is the twelfth root of unity". It's one of the structures studied by a branch of mathematics called number theory. For simplicity, I refer to its elements as "dodecs" -- short for "dodecagonal numbers" -- in the code implementation. I'll refer to them by the same name here, as long as you keep in mind that their actual name in maths is the former.
 
-In the code, dodecs are implemented as a class made of four integers: the coordinates with respect to the basis $\left\\{1, i, \nu, i\nu \right\\}$. It allows you to add and multiply dodecs, as well as compute their position. Since performing operations between them doesn't generate numerical errors, there's no problem in hashing them. In fact, vertices in the TileMesh class are kept in a hashmap whose keys are dodecs. This allows us to get an existing vertex in the mesh very quickly by providing its integer coordinates.
+In the code, dodecs are implemented as a class made of four integers: the coordinates with respect to the basis $\left\\{1, i, \nu, i\nu \right\\}$. The class allows you to add and multiply dodecs, as well as compute their position. Since performing operations between them doesn't generate numerical errors, there's no problem in hashing them. In fact, vertices in the TileMesh class are kept in a hashmap whose keys are dodecs. This allows us to get an existing vertex in the mesh very quickly by providing its integer coordinates.
 
 Naturally, as seen in Section 1, we could express dodecs in many different bases. The code implementation provides conversions of the coordinates to a handful of meaningful bases other than $\left\\{1, i, \nu, i\nu \right\\}$.
 
@@ -281,7 +281,14 @@ $$
 <hr>
 </details>
 
-[CONCLUSION]
+<p align="center">
+  <img src="/Pictures/Post_2/Deflation_Coordinates.jpg" alt="Deflation Coordinates"/>
+  <p class="post-meta" align="center">Vertex Coordinates of the Deflation Diagram over the basis $\left\{ 1, \varphi, \varphi^2, \varphi^3 \right\}$</p>
+</p>
+
+This completes the search for integer coordinates to assign to the vertices of the mesh. It took a while: we went from understanding that coordinates are numbers that rely on an underlying list of generating vectors called a basis, then we understood how those coordinates allowed us to pinpoint vertex positions with extreme accuracy, and finally we saw how different coordinates could be combined to generate new points in a geometrically meaningful way.
+
+Armed with this knowledge, we will be able to implement a precise and efficient mesh, on which we can also do custom logic that is empowered by the two coordinate operations.
 
 ___
 
