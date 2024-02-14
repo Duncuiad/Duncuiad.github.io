@@ -24,8 +24,8 @@ In this series of posts, I'll gradually outline the steps that lead to building 
 <!-- Along the way, some intuitive explanations of a handful of concepts from pure maths will shed some light on why this actually works. -->
 
 <ol>
-<li><h3>Minecraft + Triangles [Upcoming]</h3></li>
-<li><h3>It's Actually Better in 4D [Upcoming]</h3></li>
+<li><h3><a href="/tilemesh/2024/02/14/tilemesh/">Minecraft + Triangles</a></h3></li>
+<li><h3>Stepping in Four Dimensions [Coming Soon]</h3></li>
 </ol>
 
 <h2>Gallery</h2>

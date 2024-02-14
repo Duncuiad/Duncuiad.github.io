@@ -1,9 +1,8 @@
 ---
 layout: post
 title:  "Minecraft + Triangles"
-date:   2024-02-03 07:38:00 +0100
+date:   2024-02-14 07:00:00 +0100
 categories: "tilemesh"
-reviewhistory: "https://github.com/Duncuiad/duncuiad.github.io/commits/main/_review/2024-02-03-tilemesh.markdown"
 ---
 
 <p align="center">
@@ -52,28 +51,35 @@ The deflation rules I use here build upon[^3] the rules introduced in \[X. Zeng 
 
 <h2>3. Deflation Rules</h2>
 
-Here are all of them:
+There are three possible subdivisions:
+
+<p align="center">
+  <a href="/Pictures/First_Deflation.svg">
+    <img src="/Pictures/First_Deflation.svg" width=600px alt="First Deflation"/>
+  </a>
+  <p class="post-meta" align="center">The subdivision rules</p>
+</p>
+
+<h3>Edge Coloring</h3>
+
+As you can see in the diagram, at each subdivision step (called a *generation*) every edge is split into two shorter edges. They both deviate $15^\circ$ from the original edge and their length is scaled by a factor of $\frac{1}{2} \left( \sqrt{6} - \sqrt{2} \right) \approx 0.5176$. If the child edges recede inside the original polygon, we say that the parent is a *red* edge. If they instead protrude outside of the original polygon, we say the parent is a *blue* edge. This behavior forces us to require pairs of polygons to be adjacent across edges of opposite colors. For instance, a blue edge on a triangle can only touch one of the red edges of a square or of another triangle. If this property isn't enforced, the following generation will have overlaps and/or uncoverable holes (at least by means of other squares and triangles), meaning that it won't be a *valid* tiling. I've added some dotted lines to the diagram to highlight the way the edge colors match the behavior of their child edges.
+
+Given a square-triangle tiling where every tile has edge color combinations selected from the collection above and where the red-blue pairing is respected, we are now able to perform a *first* subdivision step and obtain a new tiling. But how do we make sure that we can go on from there and subdivide it into yet another smaller, *valid* tiling? That is, what color do we assign to the edges of the child faces so that we have the required information for a new deflation? For that, we need to tweak the subdivision rules.
+
+<h3>Color Alternance</h3>
+
+We say that an edge is *alternating* if it splits into two edges of the opposite color: for example, a red alternating edge turns into two blue edges. We instead say that it is *non-alternating* if it splits into two edges of the same color as itself. All the edges in the deflation rules are either alternating or non-alternating: no edge splits into two child edges of different colors. In the updated deflation rules diagram below, a black dot denotes an alternating edge (you can check the color of the child edges on the right-hand side of the arrows). The absence of a dot thus denotes a non-alternating edge. A triangle's edges are either all alternating (as in the left column) or all non-alternating. Because of this, I can simply draw a single dot in the middle of the triangle.
+
+To account for color alternance, we have five different deflation rules:
 
 <p align="center">
   <a href="/Pictures/Deflation_Rules.svg">
     <img src="/Pictures/Deflation_Rules.svg" alt="Deflation"/>
   </a>
-  <p class="post-meta" align="center">Deflation rules</p>
+  <p class="post-meta" align="center">The deflation rules</p>
 </p>
 
-There's a lot happening at the same time in this picture, so let's unpack it one piece at a time. For the time being, focus on the left column and ignore all the big black dots. Also ignore how the shapes on the right of the arrows are colored (since this is what sets the left and right columns apart) and take in just their geometrical structure. The relevant information is contained in the unbroken lines. The dotted edges are meant as little more than a preview of the outline of the next generation.
-
-<h3>Edge Coloring</h3>
-
-As you can see, at each subdivision step (called a *generation*), every edge is split into two shorter edges. They both deviate $15^\circ$ from the original edge and their length is scaled by a factor of $\frac{1}{2} \left( \sqrt{6} - \sqrt{2} \right) \approx 0.5176$. If the child edges are inside the original polygon, we say that the parent is a *red* edge. If they instead end up outside of the original polygon, we say the parent is a *blue* edge. This means that in any tiling, two polygons can only be adjacent across edges of opposite colors. For instance, a blue edge on a triangle can only touch one of the red edges of a square or of another triangle. If this property isn't enforced, the following generation will have overlaps and/or uncoverable holes (at least by means of other squares and triangles), meaning that it won't be a *valid* tiling. The reason for including the dotted lines in the diagrams is that they make it easier to identify which side of the inner edges is meant to be red and which is meant to be blue.
-
-Given a square-triangle tiling where every tile has edge color combinations selected from the collection above and where the red-blue pairing is respected, we are now able to perform a *first* subdivision step and obtain a new tiling. But how do we make sure that we can go on from there and subdivide it into yet another smaller, *valid* tiling? Which is to say: what color do we assign to the edges of the child faces so that we have the required information for a new deflation? This is where the dots come into play.
-
-<h3>Color Alternance</h3>
-
-We say that an edge is *alternating* if it splits into two edges of the opposite color: for example, a red alternating edge turns into two blue edges. We instead say that it is *non-alternating* if it splits into two edges of the same color as itself. All the edges in the deflation rules are either alternating or non-alternating: no edge splits into two child edges of different colors. In the deflation rules diagram, a black dot denotes an alternating edge (you can check the color of the child edges on the right-hand side of the arrows). The absence of a dot thus denotes a non-alternating edge. A triangle's edges are either all alternating (as in the left column) or all non-alternating. Because of this, I can simply draw a single dot in the middle of the triangle.
-
-Since color pairings must be conserved at each following generation, a tile's alternating edge can only be adjacent to another tile's edge that is *also alternating*. Similarly, non-alternating edges can only be adjacent to other non-alternating edges. We end up with four different types of edges, one for each combination of 'red'/'blue' and 'alternating'/'non-alternating'. You can see how they all evolve after one deflation (that is, which of the four types is assigned to their two children) on the right-hand side of the arrows. I've also included a section on the bottom right of the diagram where you can see how each of them evolves after two consecutive deflations.
+Since color pairings must be conserved at each following generation, a tile's alternating edge can only be adjacent to another tile's edge that is *also alternating*. Similarly, non-alternating edges can only be adjacent to other non-alternating edges. We end up with four different types of edges, one for each combination of 'red'/'blue' and 'alternating'/'non-alternating'. You can see how they all evolve after one deflation (that is, which of the four types is assigned to each of their two children) on the right-hand side of the arrows. I've also included a section on the bottom right of the diagram where you can see how each of them evolves after two consecutive deflations.
 
 With both *coloring* and *alternance* taken into account, the subdivision can be performed indefinitely. This means that no matter what shape we start with, we can generate an arbitrarily large grid made up of triangles and squares.
 
@@ -84,7 +90,7 @@ With both *coloring* and *alternance* taken into account, the subdivision can be
   </p>
 </p>
 
-Wait, why did I include only four of them? Well, that's because the square in the right column of the diagram *has* its own deflation rule, but it doesn't show up in the result of any of the five rules, not even its own. It's bound to disappear as soon as one subdivision is performed, so we could just as well do without it. Let's give a name to the other four shapes then. We have a triangle whose edges are all *a*lternating, so that has to be an A-Triangle. One of the squares is all red, earning the title of R-Square. Let's settle on N-Triangle and B-Square for the other two.
+Wait, why did I include only four of them? Well, that's because the square in the right column of the diagram *does* have a deflation rule, but it does not show up in the result of any of the five rules, not even its own. It's bound to disappear as soon as one subdivision is performed, so we could just as well do without it. Let's give a name to the other four shapes then. We have a triangle whose edges are all *a*lternating, so that has to be an A-Triangle. One of the squares is all red, earning the title of R-Square. Let's settle on N-Triangle and B-Square for the other two.
 
 The B-Square is quite special because its deflation rule allows it to tile a *periodic* square grid. So nothing prevents us from wrapping a grid *Pac-Man-style* and obtain a tiled world without a boundary. This is unique to the B-Square, since there's no way to similarly arrange any of the other three shapes[^4].
 
