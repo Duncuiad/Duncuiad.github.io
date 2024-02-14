@@ -43,6 +43,12 @@ In this series of posts, I'll gradually outline the steps that lead to building 
 </p>
 
 <p align="center">
+  <a href="/Pictures/Buildings.png">
+    <img src="/Pictures/Buildings.png" alt="Tiles"/>
+  </a>
+</p>
+
+<p align="center">
   <a href="/Pictures/Gallery_3.png">
     <img src="/Pictures/Gallery_3.png" alt="Tiles"/>
   </a>
