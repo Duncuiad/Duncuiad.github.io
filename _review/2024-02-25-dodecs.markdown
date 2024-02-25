@@ -1,0 +1,258 @@
+---
+layout: post
+title:  "Like Playing 4D Chess"
+date:   2024-02-25 07:38:00 +0100
+categories: "tilemesh"
+reviewhistory: "https://github.com/Duncuiad/duncuiad.github.io/commits/main/_review/2024-02-09-dodecs.markdown"
+---
+
+<p align="center">
+  <img src="/Pictures/Post_2/N_from_P.svg" height=400px alt="Ni from Phi"/>
+</p>
+
+<ul>
+<li>Back to the <a href="/topics/tiles">Tiles</a> topic index.</li>
+<li><a href="https://github.com/Duncuiad/MovingFrames/blob/main/OpenGLPG/Core/Dodec.h">Dodec</a> on GitHub <svg class="svg-icon"><use xlink:href="{{ '/assets/minima-social-icons.svg#github' | relative_url }}"></use></svg> </li>
+</ul>
+
+In the introductory post to the *Tiles* section, we saw how to generate a square-triangle tiling of the plane. At the end of that post, I called your attention to a handful of questions that relate to how this generation can be best implemented. I'll recap the first two issues here, so that it will be easier to keep them in mind as you read the post.
+- When an edge gets split in two, we use the edge's vertices' positions to calculate the middle vertex's position on the plane. Every time this happens, the numerical errors get worse.
+- One defining property of regular grids, like a checkerboard pattern, is that each vertex is identified by its coordinates on the grid. For example, we can take the point $(78, -172)$ and immediately know two things: that it is indeed a vertex in the grid, and that its neighbours are exactly the vertices $(77, -172)$, $(79, -172)$, $(78, -173)$ and $(78, -171)$, respectively to the west, the east, the south and the north of the original point. This doesn't work on a generic polygonal mesh.
+
+In this post, we'll see that there actually exists a coordinate system which works well with square-triangle grids. What's more, this coordinate system allows us to directly retrieve the position of any point in the grid. Finding a solution to the second issue, then, will immediately give us a solution to the first one.
+
+In order to find the coordinate system that suits our needs, I'll have to take a detour to expand on two important concepts: what coordinates really are and how we can use the product and sum of complex numbers to construct all the possible points in the square-triangle grid using only a handful of basic points
+
+<h2>1. What are coordinates, really?</h2>
+
+Coordinates are a lot like a recipe, in that they tell you how much of different ingredients you need to blend, in order to obtain the result you want. What is often implicit or overlooked, when we talk about coordinates, is what these ingredients actually are in any given context. 
+
+To avoid confusion, I'll stick to a naming convention: the term 'coordinate' will only be used here to describe the *integer* kind of coordinates, whereas we'll refer to the concept of "$x-$ and $y-$ *real* coordinates" of a point on the plane simply as its 'position'.
+
+Let's begin with coordinates on a square grid: we're all familiar with identifying points on such a grid by counting how many steps east and how many steps north we need to take to reach those points when starting from the origin.
+
+<p align="center">
+  <img src="/Pictures/Post_2/Square_Grid.svg" height=400px alt="Square Grid"/>
+  <p class="post-meta" align="center">Coordinates on a square grid</p>
+</p>
+
+I've written down the point $(3,2)$ in the picture using its complex form: $3+2i$. Complex numbers are a great tool when doing 2D geometry. We'll have our chance to leverage them later, so let's start using them from the very beginning and get some familiarity. What's important here is just that there are two special 'vectors'[^vector], $1$ and $i$, from which we can build all other points in the grid, starting from the origin, which is the 'vector' $0$.
+
+So far we've had two possible directions to move along -- horizontal and vertical -- and two integers: the number of steps (with sign) along each direction. Moving on to a triangular grid, we see that we can move in three different directions. So do we need three integers to identify a point on the grid? The answer is no: three are too many.
+
+<p align="center">
+  <img src="/Pictures/Post_2/Triangular_Grid.gif" alt="Triangular Grid"/>
+  <p class="post-meta" align="center">Coordinates on a triangular grid</p>
+</p>
+
+Let's give a name to the three red vectors: $1$, $\zeta$ and $\zeta^2$. If you're familiar with multiplying complex numbers, you can see how $\zeta^2$ is indeed obtained by multiplying $\zeta$ with itself. If you're not, you can take them as three symbols, each corresponding to a different vector in the plane. The picture shows a point in the grid as a circled white dot, as well as three different ways of reaching it using the red vectors. Each separate way uses only two of the three vectors.
+
+ As you probably noticed, the issue is that yes, the directions -- with their generating vectors -- are three, but they are not *independent*. You can obtain any of the three vectors from the other two[^3]: $\zeta^2$ can be reached by going against $1$ once and then taking one step against $\zeta$. In formulas, $\zeta^2=-1-\zeta$. Of course, there's nothing more fundamental about $\zeta$ and $1$ than $\zeta^2$: we have $\zeta=-1-\zeta^2$ and even $1$ is just $1=-\zeta-\zeta^2$.
+
+We say that each of the collections $\left\\{1, \zeta \right\\}$, $\left\\{1, \zeta^2 \right\\} $ and $\left\\{\zeta,\zeta^2\right\\}$ is a *basis*. For a collection of vectors to form a basis, it needs to satisfy two properties at the same time. As we have just seen, the vectors need to be independent, so that we're not including *more* vectors *than are necessary*. But to make up a basis, they also need to be *enough*, in that any point of the grid must be reachable by taking an integer number of steps along those vectors. If this is the case, we say that these vectors *generate* the grid. For example, the collection $\left\\{1, 2\zeta \right\\}$ is made of independent vectors but it is not a basis of the triangular grid, because the point $\zeta$ can't be reached[^5].
+
+What the picture highlights, then, is that each basis assigns *different coordinates* to the same point. Which of the possible bases we use is not so important. What we need to keep in mind, rather, is that coordinates only have meaning in relation to one specific basis. 
+
+This is the key takeaway of this first detour: basis vectors are the *ingredients* to some coordinates' *recipe*. If we want to find a coordinate system for the square-triangle grid, what we need to identify is one -- or more -- collections of vectors on the plane that are at the same time *independent* and *generate* all points on the grid.
+
+<h2>2. Finding the 'middle point' of an edge</h2>
+
+Take a moment to think back to the first post, where we discussed the deflation rules for the square-triangle grid. When a deflation step is applied, all the edges in the grid are split into two new edges. These two child edges meet at a vertex that wasn't in the grid before the deflation. Let's call this vertex the 'middle point' of the parent edge. Since we generate grids by applying consecutive deflations to a simple square or triangle, all vertices in any grid are either the vertices of the original shape or the middle point of some pair of vertices of the previous generation (which themselves were either vertices of the original shape or middle points -- and so on). Generating all the vertices of the grid has just turned into the way simpler task of finding the middle point for any given (ordered) pair of vertices.
+
+The prototypical example of middle point is the one constructed on the edge that goes from $0$ to $1$. Let's call this point $\nu$ (pronounced 'nee' or 'noo'). As in the last post, it's a point that makes an angle of $15^\circ$ counterclockwise with the $x$ axis and whose distance from $0$ is $\frac{1}{2} \left( \sqrt{6} - \sqrt{2} \right)$. You can also check that its real part is exactly $\frac{1}{2}$.
+
+Using $\nu$, it's easy to generate all other middle points just by scale, rotation, and translation. This is how it's done on the complex plane:
+
+<p align="center">
+  <img src="/Pictures/Post_2/Middle_Point.gif" alt="Middle Point"/>
+  <p class="post-meta" align="center">Bringing $\nu$ to a different edge</p>
+</p>
+
+By rotating and scaling $\nu$ by a factor of $q-p$ and then translating it by $p$, $\nu$ can be taken from the edge $0$-$1$ to an arbitrary edge $p$-$q$.
+
+For any two points $p$ and $q$, this simple formula returns their middle point on the complex plane:
+
+$$
+\text{m}\left(p,q\right) = p + \nu \left(q-p\right)
+$$
+
+We now can use the formula to deduce the position of all the vertices of a tiling after one round of deflation:
+
+<p align="center">
+  <img src="/Pictures/Post_2/Deflation_From_Midpoint.jpg" alt="Deflation Coordinates"/>
+  <p class="post-meta" align="center">Vertices of the Deflation Diagram. The middle points are obtained by applying the formula to their parent edge's endpoints</p>
+</p>
+
+We could go on forever, applying the formula to get the positions of the vertices that appear after further deflations.
+
+<h2>3. A Coordinate System for the Square-Triangle Grid</h2>
+
+In section 1, we saw how finding a coordinate system for the square-triangle grid actually means finding a basis of vectors. Now, thanks to section 2, we now know what properties we need those vectors to satisfy:
+- The original vertices of the basic square and triangle have to be in the grid generated by the basis
+- The sum of points on the grid has to be on the grid too
+- The product of a point on the grid with $\nu$ has to be on the grid as well.
+
+In the picture that depicts the vertices of the deflation diagram, you can notice that everything is built using only four elementary points, beyond $0$. They are $1$, $\nu$, $i$, and $\tau$. Every other point is obtained by addition or multiplication of those four. This sounds like a good candidate for a basis, doesn't it? Sadly, it can't be one: the four vectors are actually dependent[^6], since $\tau = 1 + i - \nu$.
+
+Mindful of what we did when we found the collection $\left\\{1, \zeta, \zeta^2 \right\\}$ to not be independent in Section 1, you might ask if we should just leave $\tau$ out of the picture and take $\left\\{1, i, \nu \right\\}$ as our basis. These vectors are indeed independent (nice!), but regretfully they don't allow us to reach all the points in the deflation diagram. This is because the grid made of all the possible combinations of $1$, $i$ and $\nu$ is closed under addition but not under multiplication[^7]. In fact, there is no way to add $1$, $i$ and $\nu$ together and obtain $i\nu$, which is precisely the product of $i$ and $\nu$.
+
+To be able to reach all points in the square-triangle grid, we need to add $i\nu$ to the collection. Luckily, that is already enough and it turns out that $\left\\{1, i, \nu, i\nu \right\\}$ is indeed a basis for the smallest *regular* grid that *contains any possible vertex* in our square-triangular grid, no matter how late it appears in the deflation process! We did it, we found our integer coordinates.
+
+<p align="center">
+  <img src="/Pictures/Post_2/NI_Basis.svg" height=400px alt="NI Basis"/>
+  <p class="post-meta" align="center">The point of coordinates $(-1,1,3,-1)$ on the basis $\left\{1, i, \nu, i\nu \right\}$ </p>
+</p>
+
+This four-dimensional regular grid in the plane is, for mathematicians, "$\mathbb{Z}\left[\zeta_{12}\right]$, the ring of integers of the cyclotomic field $\mathbb{Q}\left(\zeta_{12}\right)$, where $\zeta_{12}$ is the twelfth root of unity". It's one of the structures studied by a branch of mathematics called number theory. For simplicity, I refer to its elements as "dodecs" -- short for "dodecagonal numbers" -- in the code implementation. I'll refer to them by the same name here, as long as you keep in mind that their actual name in maths is the former.
+
+In the code, dodecs are implemented as a class made of four integers: the coordinates with respect to the basis $\left\\{1, i, \nu, i\nu \right\\}$. The class allows you to add and multiply dodecs, as well as compute their position. Since performing operations between them doesn't generate numerical errors, there's no problem in hashing them. In fact, vertices in the TileMesh class are kept in a hashmap whose keys are dodecs. This allows us to get an existing vertex in the mesh very quickly by providing its integer coordinates.
+
+Naturally, as seen in Section 1, we could express dodecs in many different bases. The code implementation provides conversions of the coordinates to a handful of meaningful bases other than $\left\\{1, i, \nu, i\nu \right\\}$.
+
+I'll use one of these to show how to build the sum and product operations on the coordinates, for two reasons: it's a basis that is more commonly used when working with $\mathbb{Z}\left[\zeta_{12}\right]$ and the calculations are a little simpler than when using the other one.
+
+This basis is $\left\\{1, \varphi, \varphi^2, \varphi^3 \right\\}$ and this picture shows how you can obtain $\nu$ with it:
+
+$$
+\nu = 1 - \varphi^2 + \varphi^3
+$$
+
+<p align="center">
+  <img src="/Pictures/Post_2/N_from_P.svg" height=400px alt="Nu from Phi"/>
+  <p class="post-meta" align="center">$\nu$ over the basis $\left\{ 1, \varphi, \varphi^2, \varphi^3 \right\}$ </p>
+</p>
+
+It also shows that, in this basis, $i = \varphi^3$. With a little calculation, you can find that $i\nu = \varphi - 1$.
+
+Using this basis, the coordinates are added like this:
+
+$$
+
+\left(x_0,y_0,z_0,w_0\right) + \left(x_1,y_1,z_1,w_1\right) = \left(x_0+x_1,y_0+y_1,z_0+z_1,w_0+w_1\right)
+
+$$
+
+and multiplied like so:
+
+$$
+
+\left(x_0,y_0,z_0,w_0\right) \cdot \left(x_1,y_1,z_1,w_1\right) =
+
+\left(
+\begin{array}{c}
+x_0 x_1 - y_0 w_1 - z_0 z_1 - w_0 y_1 - w_0 w_1 \\
+x_0 y_1 + y_0 x_1 - z_0 w_1 - w_0 z_1 \\
+x_0 z_1 + y_0 y_1 + z_0 x_1 + y_0 w_1 + z_0 z_1 + w_0 y_1 \\
+x_0 w_1 + y_0 z_1 + z_0 y_1 + w_0 x_1 + z_0 w_1 + w_0 z_1
+\end{array}
+\right)
+
+$$
+
+<details>
+<summary>$\boxed{\text{Danger, Algebra Inside}} - \text{How are the formulas obtained?}$</summary>
+<br>
+<hr>
+
+We define the sum to work like the complex sum operates on the corresponding points on the complex plane:
+
+$$
+\left(x_0,y_0,z_0,w_0\right) + \left(x_1,y_1,z_1,w_1\right) \leftrightarrow
+\left( x_0 + y_0 \varphi + z_0 \varphi^2 + w_0 \varphi^3 \right) + \left( x_1 + y_1 \varphi + z_1 \varphi^2 + w_1 \varphi^3 \right)
+$$
+
+We can rearrange the terms and factor the common ones:
+
+$$
+\begin{array}{rl}
+& x_0 + y_0 \varphi + z_0 \varphi^2 + w_0 \varphi^3 + x_1 + y_1 \varphi + z_1 \varphi^2 + w_1 \varphi^3 \\
+= & \left(x_0 + x_1\right) + \left(y_0 + y_1\right) \varphi + \left(z_0 + z_1\right) \varphi^2 + \left(w_0 + w_1\right) \varphi^3
+\end{array}
+$$
+
+Reading the coefficients of the basis vectors, we find the coordinates:
+
+$$
+\left(x_0+x_1,y_0+y_1,z_0+z_1,w_0+w_1\right)
+$$
+
+The producted is computed similarly:
+
+$$
+\left(x_0,y_0,z_0,w_0\right) \cdot \left(x_1,y_1,z_1,w_1\right) \leftrightarrow
+\left( x_0 + y_0 \varphi + z_0 \varphi^2 + w_0 \varphi^3 \right) \cdot \left( x_1 + y_1 \varphi + z_1 \varphi^2 + w_1 \varphi^3 \right)
+$$
+
+This time around distribute the product over the sum:
+
+$$
+\begin{array}{rcl}
+  &        x_0 x_1 & 1 \\
++ & \left( x_0 y_1 + y_0 x_1 \right) & \varphi \\
++ & \left( x_0 z_1 + y_0 y_1 + z_0 x_1 \right) & \varphi^2 \\
++ & \left( x_0 w_1 + y_0 z_1 + z_0 y_1 + w_0 x_1 \right) & \varphi^3 \\
++ & \left( y_0 w_1 + z_0 z_1 + w_0 y_1 \right) & \varphi^4 \\
++ & \left( z_0 w_1 + w_0 z_1 \right) & \varphi^5 \\
++ &        w_0 w_1 & \varphi^6 \\
+\end{array}
+$$
+
+A peculiarity of the number $\varphi$ is that $\varphi^4 = \varphi^2 - 1$. This lets us lower the degree of some terms, by expressing $\varphi^4$, $\varphi^5$ and $\varphi^6$ with the basis $\left\{1, \varphi, \varphi^2, \varphi^3 \right\}$:
+
+$$
+\begin{array}{rcl}
+\varphi^4 & = & \varphi^2 - 1 \\
+\varphi^5 = \varphi \cdot \varphi^4 & = & \varphi^3 - \varphi \\
+\varphi^6 = \varphi^2 \cdot \varphi^4 & = & \varphi^4 - \varphi^2 = \left(\varphi^2 - 1\right) - \varphi^2 = -1
+\end{array}
+$$
+
+Substituting in the previous expression,
+
+$$
+\begin{array}{rcl}
+  &        x_0 x_1 - \left( y_0 w_1 + z_0 z_1 + w_0 y_1 \right) - w_0 w_1 & 1\\
++ & \left( x_0 y_1 + y_0 x_1 \right) - \left( z_0 w_1 + w_0 z_1 \right) & \varphi \\
++ & \left( x_0 z_1 + y_0 y_1 + z_0 x_1 \right) + \left( y_0 w_1 + z_0 z_1 + w_0 y_1 \right) & \varphi^2 \\
++ & \left( x_0 w_1 + y_0 z_1 + z_0 y_1 + w_0 x_1 \right) + \left( z_0 w_1 + w_0 z_1 \right) & \varphi^3 \\
+\end{array}
+$$
+
+Which says that the coordinates of the product are
+
+$$
+\left(
+\begin{array}{c}
+x_0 x_1 - y_0 w_1 - z_0 z_1 - w_0 y_1 - w_0 w_1 \\
+x_0 y_1 + y_0 x_1 - z_0 w_1 - w_0 z_1 \\
+x_0 z_1 + y_0 y_1 + z_0 x_1 + y_0 w_1 + z_0 z_1 + w_0 y_1 \\
+x_0 w_1 + y_0 z_1 + z_0 y_1 + w_0 x_1 + z_0 w_1 + w_0 z_1
+\end{array}
+\right)
+$$
+
+<hr>
+</details>
+
+<p align="center">
+  <img src="/Pictures/Post_2/Deflation_Coordinates.jpg" alt="Deflation Coordinates"/>
+  <p class="post-meta" align="center">Vertex Coordinates of the Deflation Diagram over the basis $\left\{ 1, \varphi, \varphi^2, \varphi^3 \right\}$</p>
+</p>
+
+This completes the search for integer coordinates to assign to the vertices of the mesh. It took a while: we went from understanding that coordinates are numbers that rely on an underlying list of generating vectors called a basis, then we understood how those coordinates allowed us to pinpoint vertex positions with extreme accuracy, and finally we saw how different coordinates could be combined to generate new points in a geometrically meaningful way.
+
+Armed with this knowledge, we will be able to implement a precise and efficient mesh, on which we can also do custom logic that is empowered by the two coordinate operations.
+
+___
+
+<h3>Notes and References:</h3>
+
+[^vector]: I'll sometimes use the term 'vector' improperly in this post for a simple reason: people who didn't study maths at university are used to calling objects with multiple coordinates 'vectors'. There's no doubt that any mathematician who happens to read this page is going to badly cringe every single time they see the word 'vector' used in this context. If you're wondering why, it's because the spaces treated in this post are not vector spaces, but $\mathbb{Z}$-modules. They share similarities with vector spaces, but they are way less straightforward.
+
+[^3]: You might be tempted to infer that since the plane is bidimensional, there can't be grids with bases made of more than two vectors. However the grid we'll use later is an example of a grid with larger basis. Your intuition would be correct in the context of *vector spaces*, where scalars are free to range over numbers like the reals. In that context, the 'dimension' is exactly the number of elements of a basis, so all bases of the plane have two elements. Here however we're working with a different structure, a $\mathbb{Z}$-module, where the scalars range over the integers.
+
+[^5]: Here you can spot one big difference between *actual* vector spaces and these grids, which are objects called free $\mathbb{Z}$-modules. In vector spaces of dimension $n$, as soon as you have $n$ independent vectors, they form a basis: you can reach all the vector space. On the triangular grid however, sometimes two independent vectors are enough and sometimes they are not.
+
+[^6]: Remember that we mean *dependent over the integers*: which stands for being able to express a vector as a combination of the others in the collection *with integer coefficients*.
+
+[^7]: Not being "closed under multiplication" means that we can find two points on the grid such that their product is a point that doesn't lie on the grid: it *escaped* via multiplication, because the grid wasn't "closed".
