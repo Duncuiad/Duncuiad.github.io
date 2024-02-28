@@ -15,7 +15,7 @@ reviewhistory: "https://github.com/Duncuiad/duncuiad.github.io/commits/main/_rev
 <li><a href="https://github.com/Duncuiad/MovingFrames/blob/main/OpenGLPG/Core/Dodec.h">Dodec</a> on GitHub <svg class="svg-icon"><use xlink:href="{{ '/assets/minima-social-icons.svg#github' | relative_url }}"></use></svg> </li>
 </ul>
 
-In the introductory post to the *Tiles* section, we saw how to generate a square-triangle tiling of the plane. At the end of that post, I called your attention to a handful of questions that relate to how this generation can be best implemented. I'll recap the first two issues here, so that it will be easier to keep them in mind as you read the post.
+In the <a href="/tilemesh/2024/02/14/tilemesh/">introductory post</a> to the *Tiles* section, we saw how to generate a square-triangle tiling of the plane. At the end of that post, I called your attention to a handful of questions that relate to how this generation can be best implemented. I'll recap the first two issues here, so that it will be easier to keep them in mind as you read the post.
 - When an edge gets split in two, we use the edge's vertices' positions to calculate the middle vertex's position on the plane. Every time this happens, the *numerical errors* get worse.
 - One defining property of regular grids, like a checkerboard pattern, is that each vertex is identified by its *coordinates* on the grid. For example, we can take the point $(78, -172)$ and immediately know two things: that it is indeed a vertex in the grid, and that its neighbours are exactly the vertices $(77, -172)$, $(79, -172)$, $(78, -173)$ and $(78, -171)$, respectively to the west, the east, the south and the north of the original point. Unfortunately, this structure is not available on just any polygonal mesh.
 
@@ -27,7 +27,7 @@ In order to find the coordinate system that suits our needs, I first need to tak
 
 Coordinates are a lot like a recipe, in that they tell you how much of various ingredients you need to blend to obtain the result you're looking for. What is often implicit or overlooked, when we talk about coordinates in any given context, is what these ingredients actually are.
 
-To avoid confusion, I'll stick to a naming convention: the term 'coordinate' will only be used here to describe the *integer* kind of coordinates, whereas we'll refer to the concept of "$x-$ and $y-$ *real* coordinates" of a point on the plane simply as its 'position'.
+To avoid confusion, I'll stick to a naming convention: the term 'coordinate' will only be used here to describe the *integer* kind of coordinates, whereas I'll refer to the concept of "$x-$ and $y-$ *real* coordinates" of a point on the plane simply as its 'position'.
 
 Let's begin with coordinates on a square grid: we're all familiar with identifying points on such a grid by counting how many steps east and how many steps north we need to take to reach those points when starting from the origin.
 
@@ -36,7 +36,7 @@ Let's begin with coordinates on a square grid: we're all familiar with identifyi
   <p class="post-meta" align="center">Coordinates on a square grid</p>
 </p>
 
-I've written down the point $(3,2)$ in the picture using its complex form: $3+2i$. Complex numbers are a great tool when doing 2D geometry. We'll have our chance to leverage them later, so let's start using them from the very beginning and get some familiarity. What's important here is just that there are two special 'vectors'[^vector], $1$ and $i$, from which we can build all other points in the grid, starting from the origin, which is the 'vector' $0$.
+I've written down the point $(3,2)$ in the picture using its complex form: $3+2i$. Complex numbers are a great tool for 2D geometry. We'll have our chance to leverage them later, so let's start using them from the outset and get some familiarity. What's important here is just that there are two special 'vectors'[^vector], $1$ and $i$, from which we can build all other points in the grid, starting from the origin, which is the 'vector' $0$.
 
 So far we've had two possible directions to move along -- horizontal and vertical -- and two integers: the number of steps (with sign) along each direction. Moving on to a triangular grid, we see that we can move in three different directions. So do we need three integers to identify a point on the grid? The answer is no: three are too many.
 
@@ -45,15 +45,15 @@ So far we've had two possible directions to move along -- horizontal and vertica
   <p class="post-meta" align="center">Coordinates on a triangular grid</p>
 </p>
 
-Let's give a name to the three red vectors: $1$, $\zeta$ and $\zeta^2$. If you're familiar with multiplying complex numbers, you can see how $\zeta^2$ is indeed obtained by multiplying $\zeta$ with itself. If you're not, you can take them as three symbols, each corresponding to a different vector in the plane. The picture shows a point in the grid as a circled white dot, as well as three different ways of reaching it using the red vectors. Each separate way uses only two of the three vectors.
+Let's give a name to the three red vectors: $1$, $\zeta$ and $\zeta^2$. If you're familiar with multiplying complex numbers, you can see how $\zeta^2$ is indeed obtained by multiplying $\zeta$ with itself. If you're not, you can take them as three symbols, each corresponding to a different vector in the plane. The picture shows a point on the grid as a circled white dot, as well as three different ways of reaching it using the red vectors. Each separate way uses *only two* of the three vectors.
 
- As you probably noticed, the issue is that yes, the directions -- with their generating vectors -- are three, but they are not *independent*. You can obtain any of the three vectors from the other two[^3]: $\zeta^2$ can be reached by going against $1$ once and then taking one step against $\zeta$. In formulas, $\zeta^2=-1-\zeta$. Of course, there's nothing more fundamental about $\zeta$ and $1$ than $\zeta^2$: we have $\zeta=-1-\zeta^2$ and even $1$ is just $1=-\zeta-\zeta^2$.
+The directions -- with their generating vectors -- are indeed three, but, as you might have noticed, they are not *independent*. You can obtain any of the three vectors from the other two[^3]: $\zeta^2$ can be reached by going against $1$ once and then taking one step against $\zeta$. In formulas, $\zeta^2=-1-\zeta$. Of course, there's nothing more fundamental about $\zeta$ and $1$ than $\zeta^2$: we have $\zeta=-1-\zeta^2$ and even $1$ is just $1=-\zeta-\zeta^2$.
 
 We say that each of the collections $\left\\{1, \zeta \right\\}$, $\left\\{1, \zeta^2 \right\\} $ and $\left\\{\zeta,\zeta^2\right\\}$ is a *basis* of the triangular grid. 
 
 <h3>Coordinates and Bases</h3>
 
-For a collection of vectors to form a basis, it needs to satisfy two properties at the same time. As we have just seen, the vectors need to be independent, so that we're not including *more* vectors *than are necessary*. But to make up a basis, they also need to be *enough*, in that any point of the grid must be reachable by taking a sequence of steps along those vectors. In that case, we say that the vectors *generate* the grid. For example, the collection $\left\\{1, 2\zeta \right\\}$ is made of independent vectors but it fails to be a basis of the triangular grid, since the point $\zeta$ can't be reached[^5].
+For a collection of vectors to form a basis, it needs to satisfy two properties at the same time. As we have just seen, the vectors need to be independent, so that we're not including *more* vectors *than are necessary*. But to make up a basis, they also need to be *enough*, in that any point of the grid must be reachable by taking a sequence of steps along those vectors. In that case, we say that the vectors *generate* the grid. As an example of why we want this to hold, take the collection $\left\\{1, 2\zeta \right\\}$. It is made of independent vectors but it fails to be a basis of the triangular grid, since the point $\zeta$ can't be reached[^5].
 
 What the picture highlights, then, is that each basis assigns *different coordinates* to the same point. Which of the possible bases we use is not so important. What we need to keep in mind, rather, is that coordinates only have meaning in relation to one specific basis. 
 
@@ -61,9 +61,9 @@ This is the key takeaway of this first detour: basis vectors are the *ingredient
 
 <h2>2. Finding the 'Middle Point' of an Edge</h2>
 
-Take a moment to think back to the first post, where we discussed the deflation rules for the square-triangle grid.
+Take a moment to think back to the first post, <a href="/tilemesh/2024/02/14/tilemesh#Deflation_Rules">where we discussed the deflation rules</a> for the square-triangle grid.
 
-When a deflation step is applied, all the edges in the grid are split into two new edges. These two child edges meet at a vertex that wasn't in the grid before the deflation. Let's call this vertex the 'middle point' of the parent edge. Since we generate grids by applying consecutive deflations to a simple square or triangle, all vertices in any grid are either the vertices of the original shape or the middle point of some pair of vertices of the previous generation (which themselves were either vertices of the original shape or middle points -- and so on). Following this line of thought to its final consequence, we can deconstruct the problem of generating all the vertices of the grid into repeatedly performing the much simpler task of finding the middle point for any given (ordered) pair of vertices.
+When a deflation step is applied, all the edges in the grid are split into two new edges. These two child edges meet at a vertex that wasn't in the grid before the deflation. Let's call this vertex the 'middle point' of the parent edge. Since we generate grids by applying consecutive deflations to a simple square or triangle, all vertices in any grid are either the vertices of the original shape or the middle point of some pair of vertices of the previous generation (which themselves were either vertices of the original shape or middle points -- and so on). Following this line of thought to its final consequence, we can deconstruct the problem of generating all the vertices of the grid into the repetition of the much simpler task of finding the middle point of any given (ordered) pair of vertices.
 
 The prototypical example of a middle point is the one constructed on the edge that goes from $0$ to $1$. Let's call this point $\nu$ (pronounced 'nee' or 'noo'). As we saw in the last post, it's a point that makes an angle of $15^\circ$ counterclockwise with the $x$ axis and whose distance from $0$ is $\frac{1}{2} \left( \sqrt{6} - \sqrt{2} \right)$. You can also check that its real part is $\frac{1}{2}$.
 
@@ -118,7 +118,7 @@ To successfully reach all points in the square-triangle grid, we need to add $i\
 <summary>$\boxed{\text{Proof}} - \text{The grid generated by } \left\{1, i, \nu, i\nu \right\} \text{ is closed under multiplication}$</summary>
 <br>
 <hr>
-Since the complex product distributes over the sum, we can simply check that multiplying elements of the candidate basis together always yields points that lie on the grid generated by that same collection.
+Since the complex product distributes over the sum, it's sufficient to check something simpler: that multiplying elements of the candidate basis together always yields points that lie on the grid generated by that same collection.
 
 <br>
 Here are the possible products (I'll skip those involving $1$ because they are obvious):
@@ -133,7 +133,7 @@ i\nu \cdot i\nu & = & -\nu^2 = i - \nu - 2i\nu \\
 \end{array}
 $$
 
-Checking that $\nu^2 = -i + \nu + 2i\nu$ isn't as immediate as the other equalities, but you can check it, for example, by equating the real and imaginary parts of the two sides of the equality.
+Checking that $\nu^2 = -i + \nu + 2i\nu$ isn't as immediate as the other equalities, but you can verify it, for example, by equating the real and imaginary parts of the two sides of the equality.
 
 <br>
 <hr>
@@ -157,9 +157,9 @@ Naturally, as seen in Section 1, we could express dodecs in many different bases
 
 <h3>Adding and Multiplying Coordinates</h3>
 
-Remember that we use sums and products of points on the square-triangle grid to generate the vertices of a new deflation. This makes the two operations pivotal to the generation of the grid, so we need a way to perform them efficiently.
+Remember that we use sums and products of points that lie on the square-triangle grid to generate the vertices of a new deflation. This makes the two operations pivotal to the generation of the grid, so we need a way to perform them efficiently.
 
-Since the dodec grid is closed under addition and multiplication (of complex numbers), we could take two sets of coordinates, find what points they represent on some basis, add or multiply those points together and then find the coordinates that represent the result on the same basis. This procedure, transposed directly in code, would require introducing approximations in the first and second steps, preventing us from being able to perform the third and last one.
+Since the dodec grid is closed under addition and multiplication (of complex numbers), we could take two coordinate quadruples, find what points they represent on some basis, add or multiply those points together on the complex plane and then find the coordinates that represent the result on the same basis. This procedure, transposed directly in code, would require introducing approximations in the first and second steps, preventing us from being able to perform the third and last one.
 
 Lucky for us, we can do the mathematical heavy-lifting up-front and obtain formulas for adding and multiplying the coordinates directly, without performing any conversion down the line. The formula for the sum is the same in all bases, whereas the product one changes based on the particular basis being used.
 
@@ -346,10 +346,10 @@ ___
 
 [^7]: Being closed under addition and multiplication means that if any two points are on the grid, then it's guaranteed that respectively their sum and their product are on the grid as well.
 
-[^8]: Notice that we can drop the explicit requirement of $1+i$ being on the grid: its presence follows from $1$ and $i$ being included and the grid being closed under addition. Also notice how, compared to the previous set of properties, we had to explicitly require $\nu$ to be included.
+[^8]: Notice that we can drop the explicit requirement of $1+i$ being on the grid: its presence follows from $1$ and $i$ being included and the grid being closed under addition. Also notice how, compared to the previous set of properties, we have to explicitly require $\nu$ to be included.
 
-[^9]: This kind of structure is called a *ring* in maths. In particular, this would be a *subring* of the complex numbers. This particular ring also happens to be a free *abelian group* (of finite rank), which is another name for a (free) $\mathbb{Z}$-module. It's this latter kind of structure that we're actually interested in when we talk about (regular) grids: the set of all points that can be reached by stepping (with *full steps*) along a finite collection of 'vectors'.
+[^9]: This kind of structure is called a *ring* in maths. In particular, this would be a *subring* of the complex numbers. The particular ring we will build also happens to be a free *abelian group* (of finite rank), which is another name for a (free) $\mathbb{Z}$-module. It's this latter kind of structure that we're actually interested in when we talk about (regular) grids: the set of all points that can be reached by stepping (with *full steps*) along a finite collection of 'vectors'.
 
 [^10]: A neat consequence of this is that we can easily, given a fixed deflation height and a vertex on the grid, retrieve all the vertices adjacent to the given vertex in constant time, without the need to keep them stored in memory for all vertices. That's because we can calculate the coordinates of all the candidate neighbouring vertices (they are 12) and check if any of them are actually on the mesh. Most of the times, 5 (and sometimes 6) out of the 12 candidates will be retrieved successfully.
 
-[^11]: $\varphi$ is actually the primitive twelfth root of unity itself: $\zeta_{12}$. However, I thought I'd keep things simple and assign a different name to each primitive root of unity that gets used in this post. You might have spotted the others: $\zeta$ is actually $\zeta_3$, $i$ is $\zeta_4$ and $\tau$ is $\zeta_6$.
+[^11]: $\varphi$ is actually the primitive twelfth root of unity itself: $\zeta_{12}$. However, I thought I'd keep things simple and assign a different name to each primitive root of unity that gets used in this post. You might have spotted the other ones: $\zeta$ is actually $\zeta_3$, $i$ is $\zeta_4$ and $\tau$ is $\zeta_6$.

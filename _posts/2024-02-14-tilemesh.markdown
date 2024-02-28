@@ -49,6 +49,7 @@ This kind of iterative process is referred to as 'applying a [deflation  rule](h
 
 The deflation rules I use here build upon[^3] the rules introduced in \[X. Zeng & G. Ungar (2006)\][^R1].
 
+<a id="Deflation_Rules">
 <h2>3. Deflation Rules</h2>
 
 There are three possible subdivisions:
