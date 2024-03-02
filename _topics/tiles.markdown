@@ -14,48 +14,46 @@ description: >-
 <a href="https://github.com/Duncuiad/MovingFrames/blob/main/OpenGLPG/Core/TileMesh.h">TileMesh</a> on GitHub <svg class="svg-icon"><use xlink:href="{{ '/assets/minima-social-icons.svg#github' | relative_url }}"></use></svg>, part of the <a href=" https://github.com/Duncuiad/MovingFrames">Moving Frames</a> repository.
 
 <p align="center">
-  <img src="/Pictures/TileMesh1.png" alt="Tiles"/>
+  <img src="/Pictures/TileMesh_Topic/TileMesh1_s.jpg" alt="Tiles"/>
 </p>
 
 <h2>Posts</h2>
 
 In this series of posts, I'll gradually outline the steps that lead to building an efficient grid made of squares and regular triangles. I'll cover everything from the geometrical construction, to the data structures, to implementing optimized raycasts to pick single tiles.
 
-<!-- Along the way, some intuitive explanations of a handful of concepts from pure maths will shed some light on why this actually works. -->
-
 <ol>
 <li><h3><a href="/tilemesh/2024/02/14/tilemesh/">Minecraft + Triangles</a></h3></li>
-<li><h3>Stepping in Four Dimensions [Coming Soon]</h3></li>
+<li><h3>Dodecagonal Coordinates [Coming Soon]</h3></li>
 </ol>
 
 <h2>Gallery</h2>
 
 <p align="center">
-  <a href="/Pictures/Gallery_1.png">
-    <img src="/Pictures/Gallery_1.png" alt="Tiles"/>
+  <a href="/Pictures/TileMesh_Topic/Gallery_1.png">
+    <img src="/Pictures/TileMesh_Topic/Gallery_1_s.jpg" alt="Tiles"/>
   </a>
 </p>
 
 <p align="center">
-  <a href="/Pictures/Gallery_2.png">
-    <img src="/Pictures/Gallery_2.png" alt="Tiles"/>
+  <a href="/Pictures/TileMesh_Topic/Gallery_2.png">
+    <img src="/Pictures/TileMesh_Topic/Gallery_2_s.jpg" alt="Tiles"/>
   </a>
 </p>
 
 <p align="center">
-  <a href="/Pictures/Buildings.png">
-    <img src="/Pictures/Buildings.png" alt="Tiles"/>
+  <a href="/Pictures/TileMesh_Topic/Buildings.png">
+    <img src="/Pictures/TileMesh_Topic/Buildings_s.jpg" alt="Tiles"/>
   </a>
 </p>
 
 <p align="center">
-  <a href="/Pictures/Gallery_3.png">
-    <img src="/Pictures/Gallery_3.png" alt="Tiles"/>
+  <a href="/Pictures/TileMesh_Topic/Gallery_3.png">
+    <img src="/Pictures/TileMesh_Topic/Gallery_3_s.jpg" alt="Tiles"/>
   </a>
 </p>
 
 <p align="center">
-  <a href="/Pictures/Gallery_4.png">
-    <img src="/Pictures/Gallery_4.png" alt="Tiles"/>
+  <a href="/Pictures/TileMesh_Topic/Gallery_4.png">
+    <img src="/Pictures/TileMesh_Topic/Gallery_4_s.jpg" alt="Tiles"/>
   </a>
 </p>
