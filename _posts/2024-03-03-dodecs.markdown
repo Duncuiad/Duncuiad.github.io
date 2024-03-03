@@ -1,9 +1,8 @@
 ---
 layout: post
 title:  "Dodecagonal Coordinates"
-date:   2024-02-25 07:38:00 +0100
+date:   2024-03-03 07:38:00 +0100
 categories: "tilemesh"
-reviewhistory: "https://github.com/Duncuiad/duncuiad.github.io/commits/main/_review/2024-02-25-dodecs.markdown"
 ---
 
 <p align="center">

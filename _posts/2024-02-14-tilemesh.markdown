@@ -135,7 +135,7 @@ The purpose of the next posts is to provide satisfying answers to all of them:
 
 At the risk of spoiling some of the fun, I'll anticipate one cool fact that, at once, efficiently solves both of the first two problems. There is a way to uniquely identify every possible vertex of the grid with a label, no matter how deep the level of subdivision. This labeling has enough information to perfectly reconstruct the position of the vertex, *without* loss! And what is even more amazing is that these labels can be scaled, added, subtracted, and multiplied together *in a meaningful way*.
 
-I hope that this wild claim caught your attention, let's delve into it in the next post.
+I hope that this wild claim caught your attention, let's delve into it <a href="/tilemesh/2024/03/03/dodecs/">in the next post</a>.
 
 ___
 

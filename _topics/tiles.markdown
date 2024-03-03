@@ -23,7 +23,8 @@ In this series of posts, I'll gradually outline the steps that lead to building 
 
 <ol>
 <li><h3><a href="/tilemesh/2024/02/14/tilemesh/">Minecraft + Triangles</a></h3></li>
-<li><h3>Dodecagonal Coordinates [Coming Soon]</h3></li>
+<li><h3><a href="/tilemesh/2024/03/03/dodecs/">Dodecagonal Coordinates</a></h3></li>
+<li><h3>Picking Tiles, Faster [Coming Soon]</h3></li>
 </ol>
 
 <h2>Gallery</h2>
