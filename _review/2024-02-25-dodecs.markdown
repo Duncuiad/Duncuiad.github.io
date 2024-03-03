@@ -67,15 +67,14 @@ When a deflation step is applied, all the edges in the grid are split into two n
 
 The prototypical example of a middle point is the one constructed on the edge that goes from $0$ to $1$. Let's call this point $\nu$ (pronounced 'nee' or 'noo'). As we saw in the last post, it's a point that makes an angle of $15^\circ$ counterclockwise with the $x$ axis and whose distance from $0$ is $\frac{1}{2} \left( \sqrt{6} - \sqrt{2} \right)$. You can also check that its real part is $\frac{1}{2}$.
 
-Using $\nu$, it's easy to generate all other middle points via scale, rotation, and translation. This is how it's done on the complex plane:
+Using $\nu$, it's easy to generate all other middle points via scale, rotation, and translation. By rotating and scaling $\nu$ by a factor of $q-p$ and then translating it by $p$, $\nu$ can be taken from the edge $0$-$1$ to an arbitrary edge $p$-$q$. This is how that looks:
 
 <p align="center">
   <img src="/Pictures/Post_2/Middle_Point.gif" alt="Middle Point"/>
   <p class="post-meta" align="center">Bringing $\nu$ to a different edge</p>
 </p>
 
-By rotating and scaling $\nu$ by a factor of $q-p$ and then translating it by $p$, $\nu$ can be taken from the edge $0$-$1$ to an arbitrary edge $p$-$q$.
-
+We can also bundle this process into a single expression!
 For any two points $p$ and $q$, this simple formula returns their middle point on the complex plane:
 
 $$
