@@ -46,7 +46,7 @@ Once you know how to interpolate, you can also do transitions: let the weights v
 
 In the case of time-based transitions, it means that the weights $\lambda_i$ are going to be functions of time $\lambda_i(t)$. To transition from the vector $v_j$ to the vector $v_k$ in one second, we need to make sure that $\lambda_j$ is $1$ for $t \le 0$ (which forces all the weights except $\lambda_j$ to be $0$ during that time) and that $\lambda_k$ is $1$ for $t \ge 1$ (again, forcing all other weights to vanish).
 
-Here is an example of a transition from $v_1$ to $v_3$ given three points $v_1$, $v_2$ and $v_3$ on the plane for a particular collection of time-dependent weights:
+Here is an example of a transition from $v_1$ to $v_3$ given three points $v_1$, $v_2$ and $v_3$ on the plane for a particular collection of time-dependent weights. These are their values for $t \in \left(0,1\right)$:
 
 $$
 \begin{array}{rcl}
@@ -62,23 +62,54 @@ Add graphs for the three weights and an animation of the quadratic Bezier curve
 
 We usually want our transitions to be continuous, so that we don't suddenly teleport to a different position. Sometimes we want them to also be smooth, so that the transition happens without sudden changes in movement. The weights above generate an example of a transition that is continuous but not smooth.
 
-That's all good for time-based transitions. But we wanted to do space-based transitions, right? Well, as you've already figured out, we just need to use weights that are functions of space rather than functions of time. Suppose that we have $n$ regions $R_1, \ldots, R_n$ that overlap over a shared region $R$ and are mutually disjoint otherwise. ~~We have a property that has a different value on each region. Say for example that on the region $R_i$, the value of that property is the vector $v_i$~~. Within $R$, we want to mix the $v_i$ together in a way that links smoothly to the fixed values they take in the parts of regions $R_i$ outside the overlap $R$. In other words, we want to create weights $\lambda_i$ such that:
+That's all good for time-based transitions. But we wanted to do space-based transitions, right? Well, as you've already figured out, we just need to use weights that are functions of space rather than functions of time. Suppose that we have $n$ regions $R_1, \ldots, R_n$ that overlap over a shared region $R$ and are mutually disjoint otherwise. 
+
+{% comment %} 
+Add a diagram to show the different regions
+{% endcomment %}
+
+~~We have a property that has a different value on each region. Say for example that on the region $R_i$, the value of that property is the vector $v_i$~~. Within $R$, we want to mix the $v_i$'s together in a way that links smoothly to the fixed values they take in the parts of regions $R_i$ outside the overlap $R$. In other words, we want to create weights $\lambda_i$ such that:
 
 $$
-\begin{array}{rcl}
-\lambda_i(p) = 0   & \text{ for }  & p \in R_j \setminus R \text{, for all } i \ne j \\
-\lambda_i(p) = 1   & \text{ for }  & p \in R_i \setminus R \\
-0 < \lambda(p) < 1 & \text { for } & p \in R
+\begin{array}{rl}
+\lambda_i(p) = 0   & \text{ for }  p \in R_j \setminus R \text{, for all } i \ne j \\
+\lambda_i(p) = 1   & \text{ for }  p \in R_i \setminus R \\
+0 < \lambda_i(p) < 1 & \text { for } p \in R \\
+\lambda_1(p) + \ldots + \lambda_n(p) = 1 & \text{ everywhere } 
 \end{array}
 $$
 
-This post will focus on creating sets of smooth, position-dependent weights defined on the interior of a convex polygon
+{% comment %} 
+Add example weights
+{% endcomment %}
 
-<h2>X. Quadrilateral Crossings</h2>
+This post will focus on creating sets of smooth weights that transition over the interior of a convex polygon $P$. We'll build weights for a triangle, but the process generalises naturally to any number of edges and to three dimensions. We'll start by solving a simpler problem: finding $n$ functions $f_1, \ldots, f_n$ defined on every point of the polygon except its vertices, each of which satisfies the following properties:
+
+$$
+\begin{array}{rl}
+f_i(p) = 0   & \text{ for }  p \in E_j \text{, for all } i \ne j \\
+f_i(p) = 1   & \text{ for }  p \in E_i \\
+0 < f_i(p) < 1 & \text { for } p \in P^\circ
+\end{array}
+$$
+
+where $P^\circ$ denotes the interior of the convex polygon and $E_i$ denotes the $i$-th edge of the polygon, excluding the vertices. Notice how we're not requiring them to sum to $1$, nor to extend smoothly to a constant function across each edge. These are properties that we can extract from a collection of functions that satisfy the properties above, by processing them further.
+
+<h2>X. Edge-pair Transitions</h2>
+
+We build functions $f_i$ like above by combining sets of simpler functions. I'll denote as 
+
+$$
+\hat{P} \coloneqq P \setminus \left\{v_i\right\}_{i=1}^{n}
+$$
+
+the polygon $P$ without its vertices. Given any pair of different edges $E_i$, $E_j$ of the polygon (so $i \ne j$), let $h_{ij}$ be a continuous and smooth function over $\hat{P}$ such that $h_{ij}(p)=1$ along $E_i$, $h_{ij}(p)=0$ along $E_j$, and $0 < h_{ij}(p) < 1$ over $P^\circ$. The core idea is for $h_{ij}$ to work as a (descending) ladder from $E_i$ to $E_j$. The rest of the construction works regardless of the specific $h_{ij}$ we choose, the important part being to satisfy those properties. In practice, certain choices of $h_{ij}$ might work better than others depending on your specific combination of needs, including quality and performance.
+
+A simple but effective choice for $h_{ij}$ is the ratio of sines of the angles (...)
+
+<h2>X. Combining and Normalizing</h2>
 
 <h2>X. Making it Smooth</h2>
-
-<h2>X. Extending to a Triangle</h2>
 
 <h2>X. Result</h2>
 
