@@ -72,7 +72,7 @@ Add a diagram to show the different regions
 
 $$
 \begin{array}{rl}
-\lambda_i(p) = 0   & \text{ for }  p \in R_j \setminus R \text{, for all } i \ne j \\
+\lambda_i(p) = 0   & \text{ for }  p \in R_j \setminus R, i \ne j \\
 \lambda_i(p) = 1   & \text{ for }  p \in R_i \setminus R \\
 0 < \lambda_i(p) < 1 & \text { for } p \in R \\
 \lambda_1(p) + \ldots + \lambda_n(p) = 1 & \text{ everywhere } 
@@ -87,9 +87,9 @@ This post will focus on creating sets of smooth weights that transition over the
 
 $$
 \begin{array}{rl}
-f_i(p) = 0   & \text{ for }  p \in E_j \text{, for all } i \ne j \\
-f_i(p) = 1   & \text{ for }  p \in E_i \\
-0 < f_i(p) < 1 & \text { for } p \in P^\circ
+f_i(p) = 0 & \text{ for } p \in E_j \text{, for all } i \ne j \\
+f_i(p) = 1 & \text{ for } p \in E_i \\
+f_i(p) > 0 & \text{ for } p \in P^\circ
 \end{array}
 $$
 
@@ -103,9 +103,34 @@ $$
 \hat{P} \coloneqq P \setminus \left\{v_i\right\}_{i=1}^{n}
 $$
 
-the polygon $P$ without its vertices. Given any pair of different edges $E_i$, $E_j$ of the polygon (so $i \ne j$), let $h_{ij}$ be a continuous and smooth function over $\hat{P}$ such that $h_{ij}(p)=1$ along $E_i$, $h_{ij}(p)=0$ along $E_j$, and $0 < h_{ij}(p) < 1$ over $P^\circ$. The core idea is for $h_{ij}$ to work as a (descending) ladder from $E_i$ to $E_j$. The rest of the construction works regardless of the specific $h_{ij}$ we choose, the important part being to satisfy those properties. In practice, certain choices of $h_{ij}$ might work better than others depending on your specific combination of needs, including quality and performance.
+the polygon $P$ without its vertices. Given any pair of different edges $E_i$, $E_j$ of the polygon (so $i \ne j$), let $h_{ij}$ be a continuous and smooth function over $\hat{P}$ such that $h_{ij}(p)=1$ along $E_i$, $h_{ij}(p)=0$ along $E_j$, and $h_{ij}(p) > 0$ over $P^\circ$. The core idea is for $h_{ij}$ to work as a (descending) ladder from $E_i$ to $E_j$. The rest of the construction works regardless of the specific $h_{ij}$ we choose, the important part being to satisfy those properties. In practice, certain choices of $h_{ij}$ might work better than others depending on your specific combination of needs, including quality and performance.
 
-A simple but effective choice for $h_{ij}$ is the ratio of sines of the angles (...)
+A simple but effective choice for $h_{ij}$ is the ratio of sines of the angles $\theta$ and $\theta_0$ shown in the picture.
+
+{% comment %} 
+Add diagram for the ratio of sines
+{% endcomment %}
+
+This can be easily calculated as
+
+$$
+h_{ij}(p) = \frac{\|b-a\|}{\|p-a\|}  \cdot \frac{\left( c-a \right) \times \left( p-a \right)}{\left( c-a \right) \times \left( b-a \right)}
+$$
+
+where $v \times w$ denotes the 2d cross product of $v$ and $w$, $v \times w = v_x w_y - v_y w_x$, or equivalently the wedge product $\wedge$ if you're familiar with it. $\|v\|$ denotes instead the norm (or length) of $v$.
+
+We obtain a function that behaves like this:
+{% comment %} 
+Add graph for the ratio of sines
+{% endcomment %}
+
+If the edges are parallel, we can extend this construction by taking the limit for $a$ moving orthogonally away from the segment $\overline{bc}$. In this case, $h_{ij}$ is calculated like this:
+
+$$
+h_{ij}(p) = \frac{n \cdot \left( p-c \right)}{n \cdot \left( b-c \right)}
+$$
+
+where $n$ is any vector orthogonal to the edges $E_i$ and $E_j$. Here $v \cdot w$ denotes the dot product of $v$ and $w$, $v \cdot w = v_x w_x + v_y w_y$.
 
 <h2>X. Combining and Normalizing</h2>
 
